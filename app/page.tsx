@@ -41,7 +41,7 @@ export default function Home() {
           <Button className="ml-auto">Add Item</Button>
         </form>
       </Card>
-      <Card className="mt-7">
+      <Card className="mt-7 flex flex-col gap-4">
         {items.length ? (
           items.map((item: Item) => (
             <Checkbox
