@@ -17,9 +17,15 @@ export function InputText({ value, setValue, label, id }: InputTextProps) {
   }
 
   return (
-    <>
+    <div className="flex flex-col">
       {label && <label htmlFor={id}>{label}</label>}{" "}
-      <input type="text" id={id} onChange={onChange} value={value} />
-    </>
+      <input
+        type="text"
+        id={id}
+        onChange={onChange}
+        value={value}
+        className="border border-gray-500 rounded"
+      />
+    </div>
   );
 }
