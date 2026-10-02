@@ -1,6 +1,6 @@
 type InputTextProps = {
   value?: string | number | readonly string[];
-  setValue?: (value: unknown) => void;
+  setValue?: (value: string) => void;
   label?: string;
   id?: string;
 };
