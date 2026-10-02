@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { FormInput } from "@/types/Component";
 import { classesMerge } from "@/utils/component-classes";
+import { Icon } from "./Icon";
 
 type CheckboxProps = FormInput & {
   value?: string;
@@ -42,7 +43,7 @@ export function Checkbox({ label, id, value, state, setState }: CheckboxProps) {
           isActive && "bg-amber-600",
         )}
       >
-        {isActive && <iconify-icon icon="mdi:check" height={20} width={20} />}
+        {isActive && <Icon icon="mdi:check" height={20} width={20} />}
       </div>
 
       <input
