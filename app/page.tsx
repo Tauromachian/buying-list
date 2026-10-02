@@ -43,7 +43,7 @@ export default function Home() {
           {items.length ? (
             items.map((item: Item) => (
               <li>
-                <p className="font-bold">{item.name}</p>
+                <Checkbox label={item.name}></Checkbox>
               </li>
             ))
           ) : (
