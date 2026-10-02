@@ -30,7 +30,7 @@ export default function Home() {
         <form onSubmit={addItem} className="flex flex-col gap-3">
           <InputText label="Name" value={name} setValue={setName}></InputText>
           <InputText
-            label="Description"
+            label="Description (optional)"
             value={description}
             setValue={setDescription}
           ></InputText>
