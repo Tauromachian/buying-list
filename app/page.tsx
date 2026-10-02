@@ -25,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-200 mx-auto">
+    <div className="w-80 mx-auto">
       <Card className="mt-20">
         <form onSubmit={addItem} className="flex flex-col gap-3">
           <InputText label="Name" value={name} setValue={setName}></InputText>
