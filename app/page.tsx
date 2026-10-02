@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/Button";
 import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
+import { Checkbox } from "@/components/Checkbox";
 
 type Item = {
   id: string;
@@ -17,6 +18,8 @@ export default function Home() {
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+
+  const [activeItems, setActiveItems] = useState<string[]>([]);
 
   function addItem(event: React.SubmitEvent) {
     event.preventDefault();
@@ -39,17 +42,20 @@ export default function Home() {
         </form>
       </Card>
       <Card className="mt-7">
-        <ul>
-          {items.length ? (
-            items.map((item: Item) => (
-              <li>
-                <Checkbox label={item.name}></Checkbox>
-              </li>
-            ))
-          ) : (
-            <div>Nothing yet, Add something!</div>
-          )}
-        </ul>
+        {items.length ? (
+          items.map((item: Item) => (
+            <Checkbox
+              key={item.id}
+              label={item.name}
+              id={item.id}
+              value={item.id}
+              state={activeItems}
+              setState={setActiveItems}
+            ></Checkbox>
+          ))
+        ) : (
+          <div>Nothing yet, Add something!</div>
+        )}
       </Card>
     </div>
   );
