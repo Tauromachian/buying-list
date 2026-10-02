@@ -1,4 +1,6 @@
-type InputTextProps = {
+import { BaseComponent } from "@/types/Component";
+
+type InputTextProps = BaseComponent & {
   value?: string | number | readonly string[];
   setValue?: (value: string) => void;
   label?: string;
