@@ -44,7 +44,6 @@ export default function Home() {
             items.map((item: Item) => (
               <li>
                 <p className="font-bold">{item.name}</p>
-                <p className="opacity-80">{item.description}</p>
               </li>
             ))
           ) : (
