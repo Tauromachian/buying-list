@@ -16,7 +16,7 @@ function getClassesByVariant(variant: Variant) {
     variants: {
       variant: {
         default: "rounded bg-accent-0 px-4 py-2",
-        icon: "bg-transparent rounded-full p-1",
+        icon: "bg-transparent rounded-full flex justify-center items-center",
       },
     },
     defaultVariants: { variant: "default" },
