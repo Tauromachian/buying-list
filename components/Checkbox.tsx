@@ -7,10 +7,18 @@ import { Icon } from "./Icon";
 type CheckboxProps = FormInput & {
   value?: string;
   state: readonly string[];
+  hasStrikeThrough?: boolean;
   setState?: (value: string[]) => void;
 };
 
-export function Checkbox({ label, id, value, state, setState }: CheckboxProps) {
+export function Checkbox({
+  label,
+  id,
+  value,
+  state,
+  setState,
+  hasStrikeThrough,
+}: CheckboxProps) {
   const [isActive, setIsActive] = useState<boolean>(false);
 
   useEffect(() => {
@@ -36,7 +44,13 @@ export function Checkbox({ label, id, value, state, setState }: CheckboxProps) {
   }
 
   return (
-    <label htmlFor={id} className="cursor-pointer flex">
+    <label
+      htmlFor={id}
+      className={classesMerge(
+        "cursor-pointer flex",
+        isActive && hasStrikeThrough && "line-through",
+      )}
+    >
       <div
         className={classesMerge(
           "h-6 w-6 border-2 border-gray-0 rounded flex justify-center items-center",
