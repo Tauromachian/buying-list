@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={classesMerge(
-        "p-2 rounded-md shadow shadow-gray-400",
+        "p-5 rounded-md shadow shadow-gray-400",
         className,
       )}
     >
