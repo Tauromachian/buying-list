@@ -1,12 +1,10 @@
-import { BaseComponent } from "@/types/Component";
 import { InputHTMLAttributes } from "react";
 
-type InputTextProps = BaseComponent &
-  Partial<InputHTMLAttributes<HTMLInputElement>> & {
-    state?: string | number | readonly string[];
-    setState?: (value: string) => void;
-    label?: string;
-  };
+type InputTextProps = Partial<InputHTMLAttributes<HTMLInputElement>> & {
+  state?: string | number | readonly string[];
+  setState?: (value: string) => void;
+  label?: string;
+};
 
 export function InputText({
   state: value,
