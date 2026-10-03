@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
 import { Dialog } from "@/components/Dialog";
+import Link from "next/link";
 
 type Item = {
   id: string;
@@ -64,12 +65,12 @@ export default function Home() {
             items.map((item: Item) => (
               <li className="flex justify-between">
                 <p>{item.name}</p>
-                <a
+                <Link
                   href={`/list/${item.id}`}
                   className="text-blue-400 underline"
                 >
                   Go to list
-                </a>
+                </Link>
               </li>
             ))
           ) : (
