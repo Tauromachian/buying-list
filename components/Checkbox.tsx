@@ -39,8 +39,8 @@ export function Checkbox({ label, id, value, state, setState }: CheckboxProps) {
     <label htmlFor={id} className="cursor-pointer flex">
       <div
         className={classesMerge(
-          "h-6 w-6 border border-gray-500 rounded flex justify-center items-center",
-          isActive && "bg-amber-600",
+          "h-6 w-6 border-2 border-gray-0 rounded flex justify-center items-center",
+          isActive && "bg-accent-0",
         )}
       >
         {isActive && <Icon icon="mdi:check" height={20} width={20} />}
