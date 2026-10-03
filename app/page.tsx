@@ -11,6 +11,7 @@ import { Dialog } from "@/components/Dialog";
 type Item = {
   id: string;
   name: string;
+  itemsNumber: number;
   description: string;
 };
 
@@ -18,6 +19,7 @@ export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
 
   const [name, setName] = useState<string>("");
+  const [itemsNumber, setItemsNumber] = useState<number>(1);
   const [description, setDescription] = useState<string>("");
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -27,7 +29,10 @@ export default function Home() {
   function addItem(event: React.SubmitEvent) {
     event.preventDefault();
 
-    setItems([...items, { id: crypto.randomUUID(), name, description }]);
+    setItems([
+      ...items,
+      { id: crypto.randomUUID(), name, itemsNumber, description },
+    ]);
   }
 
   return (
@@ -42,11 +47,20 @@ export default function Home() {
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
           <form onSubmit={addItem} className="flex flex-col gap-3">
-            <InputText label="Name" value={name} setValue={setName}></InputText>
+            <InputText label="Name" state={name} setState={setName}></InputText>
+
+            <InputText
+              label="Number"
+              state={itemsNumber}
+              setState={setItemsNumber}
+              type="number"
+              min={1}
+            ></InputText>
+
             <InputText
               label="Description (optional)"
-              value={description}
-              setValue={setDescription}
+              state={description}
+              setState={setDescription}
             ></InputText>
 
             <Button className="ml-auto" onClick={() => setIsDialogOpen(false)}>
