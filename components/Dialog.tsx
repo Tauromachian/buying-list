@@ -37,7 +37,7 @@ export function Dialog({
       className="m-auto rounded-md backdrop:bg-black backdrop:opacity-30"
     >
       <Button onClick={close} className="absolute top-2 right-2" variant="icon">
-        <Icon icon="mdi:close"></Icon>
+        <Icon icon="mdi:close" className="text-danger-0"></Icon>
       </Button>
       {children}
     </dialog>
