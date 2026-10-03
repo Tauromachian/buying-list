@@ -47,7 +47,9 @@ export default function Home() {
               setValue={setDescription}
             ></InputText>
 
-            <Button className="ml-auto">Submit</Button>
+            <Button className="ml-auto" onClick={() => setIsDialogOpen(false)}>
+              Submit
+            </Button>
           </form>
         </Card>
       </Dialog>
