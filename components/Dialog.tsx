@@ -34,7 +34,7 @@ export function Dialog({
       ref={dialogRef}
       closedby="any"
       onClose={close}
-      className="m-auto rounded-md backdrop:bg-black backdrop:opacity-30"
+      className="m-auto rounded-md backdrop:bg-black backdrop:opacity-30 min-w-80"
     >
       <Button onClick={close} className="absolute top-2 right-2" variant="icon">
         <Icon icon="mdi:close" className="text-danger-0"></Icon>
