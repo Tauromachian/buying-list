@@ -1,18 +1,14 @@
 import { InputHTMLAttributes } from "react";
 
-type InputTextProps = Partial<InputHTMLAttributes<HTMLInputElement>> & {
-  state?: string | number | readonly string[];
-  setState?: (value: string) => void;
+type InputTextProps<T> = Partial<InputHTMLAttributes<HTMLInputElement>> & {
+  state?: T;
+  setState?: (value: T) => void;
   label?: string;
 };
 
-export function InputText({
-  state: value,
-  setState,
-  label,
-  id,
-  ...nativeProps
-}: InputTextProps) {
+export function InputText<
+  T extends string | number | readonly string[] | undefined,
+>({ state, setState, label, id, ...nativeProps }: InputTextProps<T>) {
   id ??= crypto.randomUUID();
 
   function onChange(event: React.ChangeEvent) {
@@ -20,7 +16,7 @@ export function InputText({
 
     const value = (event.target as HTMLInputElement).value;
 
-    setState(value);
+    setState(value as T);
   }
 
   return (
@@ -30,7 +26,7 @@ export function InputText({
         type="text"
         id={id}
         onChange={onChange}
-        value={value}
+        value={state}
         className="border border-gray-0 rounded p-1"
         {...nativeProps}
       />
