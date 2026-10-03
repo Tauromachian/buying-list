@@ -6,6 +6,7 @@ import { Button } from "@/components/Button";
 import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
 import { Checkbox } from "@/components/Checkbox";
+import { Dialog } from "@/components/Dialog";
 
 type Item = {
   id: string;
@@ -19,6 +20,8 @@ export default function Home() {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
   const [activeItems, setActiveItems] = useState<string[]>([]);
 
   function addItem(event: React.SubmitEvent) {
@@ -28,19 +31,25 @@ export default function Home() {
   }
 
   return (
-    <div className="w-80 mx-auto">
-      <Card className="mt-20">
-        <form onSubmit={addItem} className="flex flex-col gap-3">
-          <InputText label="Name" value={name} setValue={setName}></InputText>
-          <InputText
-            label="Description (optional)"
-            value={description}
-            setValue={setDescription}
-          ></InputText>
+    <div className="w-80 mx-auto mt-20">
+      <h1 className="mb-5 text-xl">Add Item</h1>
+      <Button className="ml-auto mb-5" onClick={() => setIsDialogOpen(true)}>
+        Add Item
+      </Button>
 
-          <Button className="ml-auto">Add Item</Button>
-        </form>
-      </Card>
+      <Dialog open={isDialogOpen} onClose={setIsDialogOpen}>
+        <Card>
+          <form onSubmit={addItem} className="flex flex-col gap-3">
+            <InputText label="Name" value={name} setValue={setName}></InputText>
+            <InputText
+              label="Description (optional)"
+              value={description}
+              setValue={setDescription}
+            ></InputText>
+          </form>
+        </Card>
+      </Dialog>
+
       <Card className="mt-7 flex flex-col gap-4">
         {items.length ? (
           items.map((item: Item) => (
