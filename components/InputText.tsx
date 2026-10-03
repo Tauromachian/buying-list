@@ -26,7 +26,7 @@ export function InputText({ value, setValue, label, id }: InputTextProps) {
         id={id}
         onChange={onChange}
         value={value}
-        className="border border-gray-500 rounded p-1"
+        className="border border-gray-0 rounded p-1"
       />
     </div>
   );
