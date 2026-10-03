@@ -66,6 +66,7 @@ export default function Home() {
               value={item.id}
               state={activeItems}
               setState={setActiveItems}
+              hasStrikeThrough
             ></Checkbox>
           ))
         ) : (
