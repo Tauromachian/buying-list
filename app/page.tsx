@@ -61,9 +61,19 @@ export default function Home() {
       <Card className="mt-7 flex flex-col gap-4">
         <ul>
           {items.length ? (
-            items.map((item: Item) => <li>{item.name}</li>)
+            items.map((item: Item) => (
+              <li className="flex justify-between">
+                <p>{item.name}</p>
+                <a
+                  href={`/list/${item.id}`}
+                  className="text-blue-400 underline"
+                >
+                  Go to list
+                </a>
+              </li>
+            ))
           ) : (
-            <div>Nothing yet, Add something!</div>
+            <li>Nothing yet, Add something!</li>
           )}
         </ul>
       </Card>
