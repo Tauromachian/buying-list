@@ -39,7 +39,7 @@ export function Checkbox({ label, id, value, state, setState }: CheckboxProps) {
     <label htmlFor={id} className="cursor-pointer flex">
       <div
         className={classesMerge(
-          "h-6 w-6 border border-gray-50 rounded flex justify-center items-center",
+          "h-6 w-6 border border-gray-500 rounded flex justify-center items-center",
           isActive && "bg-amber-600",
         )}
       >
