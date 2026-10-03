@@ -39,6 +39,8 @@ export default function Home() {
 
       <Dialog open={isDialogOpen} onClose={setIsDialogOpen}>
         <Card>
+          <p className="text-md font-bold mb-4">Add new item to list</p>
+
           <form onSubmit={addItem} className="flex flex-col gap-3">
             <InputText label="Name" value={name} setValue={setName}></InputText>
             <InputText
