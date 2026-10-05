@@ -7,6 +7,7 @@ import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
 import { Checkbox } from "@/components/Checkbox";
 import { Dialog } from "@/components/Dialog";
+import { Breadcrumbs, BreadcrumbItem } from "@/components/Breadcrumbs";
 
 type Item = {
   id: string;
@@ -26,6 +27,16 @@ export default function Home() {
 
   const [activeItems, setActiveItems] = useState<string[]>([]);
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      text: "Lists",
+      href: "/",
+    },
+    {
+      text: "This list",
+    },
+  ];
+
   function addItem(event: React.SubmitEvent) {
     event.preventDefault();
 
@@ -37,6 +48,10 @@ export default function Home() {
 
   return (
     <div className="w-80 mx-auto mt-20">
+      <Card className="mb-5" variant="flat">
+        <Breadcrumbs breadcrumbs={breadcrumbs}></Breadcrumbs>
+      </Card>
+
       <h1 className="mb-5 text-xl">List</h1>
 
       <Button className="ml-auto" onClick={() => setIsDialogOpen(true)}>
