@@ -38,7 +38,8 @@ export default function Home() {
   return (
     <div className="w-80 mx-auto mt-20">
       <h1 className="mb-5 text-xl">List</h1>
-      <Button className="ml-auto mb-5" onClick={() => setIsDialogOpen(true)}>
+
+      <Button className="ml-auto" onClick={() => setIsDialogOpen(true)}>
         Add Item
       </Button>
 
