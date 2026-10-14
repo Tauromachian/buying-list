@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useId, useState } from "react";
 import Link from "next/link";
 
 export type BreadcrumbItem = {
@@ -29,17 +29,23 @@ export function Breadcrumbs({
 }) {
   const [breadcrumbEls, setBreadcrumbEls] = useState<ReactNode[]>([]);
 
+  const id = useId();
+
   useEffect(() => {
     const els: ReactNode[] = [];
 
     els.push(
-      <BreadcrumbItemNode breadcrumbItem={breadcrumbs[0]}></BreadcrumbItemNode>,
+      <BreadcrumbItemNode
+        breadcrumbItem={breadcrumbs[0]}
+        key={`item-0-${id}`}
+      ></BreadcrumbItemNode>,
     );
 
     for (let i = 1; i < breadcrumbs.length; i++) {
-      els.push(<div>/</div>);
+      els.push(<div key={`separator-${i}-${id}`}>/</div>);
       els.push(
         <BreadcrumbItemNode
+          key={`item-${i}-${id}`}
           breadcrumbItem={breadcrumbs[i]}
         ></BreadcrumbItemNode>,
       );
