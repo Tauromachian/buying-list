@@ -2,12 +2,12 @@ import { boolean, date, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 100 }),
+  name: varchar({ length: 100 }).notNull(),
 });
 
 export const lists = pgTable("lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 100 }),
+  name: varchar({ length: 100 }).notNull(),
   description: varchar({ length: 200 }),
 });
 
@@ -23,9 +23,9 @@ export const usersLists = pgTable("users_lists", {
 
 export const items = pgTable("items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 120 }),
-  quantity: integer().default(1),
-  checked: boolean().default(false),
-  created_at: date(),
-  checked_at: date(),
+  name: varchar({ length: 120 }).notNull(),
+  quantity: integer().notNull().default(1),
+  checked: boolean().notNull().default(false),
+  created_at: date().notNull(),
+  checked_at: date().notNull(),
 });
