@@ -34,5 +34,5 @@ export const itemsTable = pgTable("items", {
   quantity: integer().notNull().default(1),
   checked: boolean().notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  checkedAt: timestamp("checked_at").notNull(),
+  checkedAt: timestamp("checked_at"),
 });
