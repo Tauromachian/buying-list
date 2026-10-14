@@ -12,7 +12,7 @@ import { Breadcrumbs, BreadcrumbItem } from "@/components/Breadcrumbs";
 type Item = {
   id: string;
   name: string;
-  itemsNumber: number;
+  amount: number;
   description: string;
 };
 
@@ -42,7 +42,7 @@ export default function Home() {
 
     setItems([
       ...items,
-      { id: crypto.randomUUID(), name, itemsNumber, description },
+      { id: crypto.randomUUID(), name, amount: itemsNumber, description },
     ]);
   }
 
@@ -99,7 +99,7 @@ export default function Home() {
             >
               <span className="flex justify-between ml-2 w-full">
                 <p>{item.name}</p>
-                <p className="font-bold">#{item.itemsNumber}</p>
+                <p className="font-bold">#{item.amount}</p>
               </span>
             </Checkbox>
           ))
