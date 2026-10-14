@@ -76,6 +76,12 @@ export default function Home() {
 
     setLists((prev) => [...prev, inserted]);
     setIsDialogOpen(false);
+    clearFields();
+  }
+
+  function clearFields() {
+    setName("");
+    setDescription("");
   }
 
   return (
