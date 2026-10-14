@@ -27,8 +27,6 @@ export function Checkbox({
   useEffect(() => {
     if (!value) return;
 
-    console.log(state);
-
     setIsActive(state.includes(value));
   }, [state]);
 
