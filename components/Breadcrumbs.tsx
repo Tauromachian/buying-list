@@ -12,7 +12,11 @@ function BreadcrumbItemNode({
   breadcrumbItem: BreadcrumbItem;
 }): ReactNode {
   if (breadcrumbItem.href) {
-    return <Link href={breadcrumbItem.href}>{breadcrumbItem.text}</Link>;
+    return (
+      <Link href={breadcrumbItem.href} className="text-blue-500">
+        {breadcrumbItem.text}
+      </Link>
+    );
   }
 
   return <span>{breadcrumbItem.text}</span>;
