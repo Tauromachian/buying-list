@@ -5,10 +5,12 @@ import { classesMerge } from "@/utils/component-classes";
 import { Icon } from "./Icon";
 
 type CheckboxProps = FormInput & {
+  label?: string;
   value?: string;
   state: readonly string[];
   hasStrikeThrough?: boolean;
   setState?: (value: string[]) => void;
+  children?: React.ReactNode;
 };
 
 export function Checkbox({
@@ -18,6 +20,7 @@ export function Checkbox({
   state,
   setState,
   hasStrikeThrough,
+  children,
 }: CheckboxProps) {
   const [isActive, setIsActive] = useState<boolean>(false);
 
@@ -67,7 +70,8 @@ export function Checkbox({
         onChange={update}
         className="w-0 h-0"
       />
-      <span className="ml-2">{label}</span>
+
+      {children ? children : <span className="ml-2">{label}</span>}
     </label>
   );
 }
