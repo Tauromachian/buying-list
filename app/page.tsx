@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { InputText } from "@/components/InputText";
@@ -8,28 +8,43 @@ import { Card } from "@/components/Card";
 import { Dialog } from "@/components/Dialog";
 import Link from "next/link";
 
-type Item = {
+type List = {
   id: string;
   name: string;
   createdAt: Date;
   description: string;
 };
 
+export async function loadLists(setLists: (lists: List[]) => void) {
+  const res = await fetch("/api/lists");
+  const data = await res.json();
+  setLists(data);
+}
+
+async function postList(newList: Omit<List, "id" | "createdAt">) {
+  await fetch("/api/lists", {
+    method: "POST",
+    body: JSON.stringify(newList),
+  });
+}
+
 export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [lists, setLists] = useState<List[]>([]);
+
+  useEffect(() => {
+    loadLists(setLists);
+  }, []);
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  function addItem(event: React.SubmitEvent) {
+  async function addList(event: React.SubmitEvent) {
     event.preventDefault();
 
-    setItems([
-      ...items,
-      { id: crypto.randomUUID(), name, createdAt: new Date(), description },
-    ]);
+    await postList({ name, description });
+    await loadLists(setLists);
   }
 
   return (
@@ -43,7 +58,7 @@ export default function Home() {
         <Card>
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
-          <form onSubmit={addItem} className="flex flex-col gap-3">
+          <form onSubmit={addList} className="flex flex-col gap-3">
             <InputText label="Name" state={name} setState={setName}></InputText>
 
             <InputText
@@ -61,12 +76,12 @@ export default function Home() {
 
       <Card className="mt-7 flex flex-col gap-4">
         <ul>
-          {items.length ? (
-            items.map((item: Item) => (
-              <li className="flex justify-between">
-                <p>{item.name}</p>
+          {lists.length ? (
+            lists.map((list: List) => (
+              <li className="flex justify-between" key={list.id}>
+                <p>{list.name}</p>
                 <Link
-                  href={`/list/${item.id}`}
+                  href={`/list/${list.id}`}
                   className="text-blue-400 underline"
                 >
                   Go to list
