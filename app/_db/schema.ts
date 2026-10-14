@@ -20,10 +20,10 @@ export const listsTable = pgTable("lists", {
 
 export const usersListsTable = pgTable("users_lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer()
+  userId: integer("user_id")
     .notNull()
     .references(() => usersTable.id),
-  listId: integer()
+  listId: integer("list_id")
     .notNull()
     .references(() => listsTable.id),
 });
