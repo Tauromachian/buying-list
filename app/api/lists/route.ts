@@ -11,11 +11,6 @@ export async function GET() {
 export async function POST(req: Request) {
   const list = await req.json();
 
-  console.log("list");
-  console.log("list");
-  console.log("list");
-  console.log(list);
-
   await db.insert(listsTable).values(list);
 
   return Response.json({ msg: "Success" });
