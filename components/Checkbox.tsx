@@ -56,7 +56,7 @@ export function Checkbox({
     >
       <div
         className={classesMerge(
-          "h-6 w-6 border-2 border-gray-0 rounded flex justify-center items-center",
+          "min-h-6 min-w-6 h-6 w-6 border-2 border-gray-0 rounded flex justify-center items-center",
           isActive && "bg-accent-0",
         )}
       >
