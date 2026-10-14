@@ -1,4 +1,4 @@
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, useId } from "react";
 
 type InputTextProps<T> = Partial<InputHTMLAttributes<HTMLInputElement>> & {
   state?: T;
@@ -9,7 +9,7 @@ type InputTextProps<T> = Partial<InputHTMLAttributes<HTMLInputElement>> & {
 export function InputText<
   T extends string | number | readonly string[] | undefined,
 >({ state, setState, label, id, ...nativeProps }: InputTextProps<T>) {
-  id ??= crypto.randomUUID();
+  id ??= useId();
 
   function onChange(event: React.ChangeEvent) {
     if (!setState) return;

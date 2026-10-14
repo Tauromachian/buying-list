@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 import { FormInput } from "@/types/Component";
 import { classesMerge } from "@/utils/component-classes";
@@ -30,7 +30,7 @@ export function Checkbox({
     setIsActive(state.includes(value));
   }, [state]);
 
-  id ??= crypto.randomUUID();
+  id ??= useId();
 
   function update() {
     if (!setState || !value) return;
