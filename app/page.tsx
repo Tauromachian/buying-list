@@ -9,30 +9,57 @@ import { Dialog } from "@/components/Dialog";
 import Link from "next/link";
 
 type List = {
-  id: string;
+  id: number;
   name: string;
-  createdAt: Date;
-  description: string;
+  createdAt: string;
+  description?: string;
 };
 
-export async function loadLists(setLists: (lists: List[]) => void) {
-  const res = await fetch("/api/lists");
-  const data = await res.json();
-  setLists(data);
+export async function loadLists() {
+  try {
+    const res = await fetch("/api/lists");
+    const data = await res.json();
+
+    return data;
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
-async function postList(newList: Omit<List, "id" | "createdAt">) {
-  await fetch("/api/lists", {
-    method: "POST",
-    body: JSON.stringify(newList),
-  });
+async function postList(
+  newList: Omit<List, "id" | "createdAt">,
+): Promise<List | undefined> {
+  try {
+    const res = await fetch("/api/lists", {
+      method: "POST",
+      body: JSON.stringify(newList),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      throw new Error("Res not ok");
+    }
+
+    const insertedList: List = await res.json();
+    return insertedList;
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
 export default function Home() {
   const [lists, setLists] = useState<List[]>([]);
 
   useEffect(() => {
-    loadLists(setLists);
+    async function run() {
+      const lists = await loadLists();
+
+      if (!lists) return;
+
+      setLists(lists);
+    }
+
+    run();
   }, []);
 
   const [name, setName] = useState<string>("");
@@ -43,8 +70,12 @@ export default function Home() {
   async function addList(event: React.SubmitEvent) {
     event.preventDefault();
 
-    await postList({ name, description });
-    await loadLists(setLists);
+    const inserted = await postList({ name, description });
+
+    if (!inserted) return;
+
+    setLists((prev) => [...prev, inserted]);
+    setIsDialogOpen(false);
   }
 
   return (
@@ -67,9 +98,7 @@ export default function Home() {
               setState={setDescription}
             ></InputText>
 
-            <Button className="ml-auto" onClick={() => setIsDialogOpen(false)}>
-              Submit
-            </Button>
+            <Button className="ml-auto">Submit</Button>
           </form>
         </Card>
       </Dialog>
