@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { InputText } from "@/components/InputText";
@@ -8,19 +8,73 @@ import { Card } from "@/components/Card";
 import { Checkbox } from "@/components/Checkbox";
 import { Dialog } from "@/components/Dialog";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/Breadcrumbs";
+import { useParams } from "next/navigation";
 
 type Item = {
   id: string;
+  listId: string;
   name: string;
-  amount: number;
+  quantity: number;
   description: string;
 };
+
+const BASE = "/api/items";
+
+async function loadItems(filters?: {
+  listId: string;
+}): Promise<Item[] | undefined> {
+  let endpoint = BASE;
+
+  if (filters) {
+    endpoint += "?" + new URLSearchParams(filters).toString();
+  }
+
+  try {
+    const res = await fetch(endpoint);
+
+    const items = await res.json();
+
+    return items;
+  } catch (error) {
+    console.warn(error);
+  }
+}
+
+async function postItem(item: Omit<Item, "id">): Promise<Item | undefined> {
+  try {
+    const res = await fetch(BASE, {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const insertedItem: Item = await res.json();
+
+    return insertedItem;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
 
+  const { listId } = useParams<{ listId: string }>();
+
+  useEffect(() => {
+    async function run() {
+      const items = await loadItems({ listId });
+
+      if (!items) return;
+
+      setItems(items);
+    }
+
+    run();
+  }, []);
+
   const [name, setName] = useState<string>("");
-  const [itemsNumber, setItemsNumber] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number>(1);
   const [description, setDescription] = useState<string>("");
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
@@ -37,13 +91,27 @@ export default function Home() {
     },
   ];
 
-  function addItem(event: React.SubmitEvent) {
+  async function addItem(event: React.SubmitEvent) {
     event.preventDefault();
 
-    setItems([
-      ...items,
-      { id: crypto.randomUUID(), name, amount: itemsNumber, description },
-    ]);
+    const item = await postItem({
+      name,
+      quantity,
+      description,
+      listId,
+    });
+
+    if (!item) return;
+
+    setItems([...items, item]);
+    setIsDialogOpen(false);
+    clearFields();
+  }
+
+  function clearFields() {
+    setName("");
+    setQuantity(1);
+    setDescription("");
   }
 
   return (
@@ -67,8 +135,8 @@ export default function Home() {
 
             <InputText
               label="Number"
-              state={itemsNumber}
-              setState={setItemsNumber}
+              state={quantity}
+              setState={setQuantity}
               type="number"
               min={1}
             ></InputText>
@@ -79,9 +147,7 @@ export default function Home() {
               setState={setDescription}
             ></InputText>
 
-            <Button className="ml-auto" onClick={() => setIsDialogOpen(false)}>
-              Submit
-            </Button>
+            <Button className="ml-auto">Submit</Button>
           </form>
         </Card>
       </Dialog>
@@ -99,7 +165,7 @@ export default function Home() {
             >
               <span className="flex justify-between ml-2 w-full">
                 <p>{item.name}</p>
-                <p className="font-bold">#{item.amount}</p>
+                <p className="font-bold">#{item.quantity}</p>
               </span>
             </Checkbox>
           ))
