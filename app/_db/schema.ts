@@ -8,6 +8,7 @@ export const usersTable = pgTable("users", {
 export const listsTable = pgTable("lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
+  created_at: date().notNull(),
   description: varchar({ length: 200 }),
 });
 
