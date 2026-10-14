@@ -91,13 +91,17 @@ export default function Home() {
           items.map((item: Item) => (
             <Checkbox
               key={item.id}
-              label={item.name}
               id={item.id}
               value={item.id}
               state={activeItems}
               setState={setActiveItems}
               hasStrikeThrough
-            ></Checkbox>
+            >
+              <span className="flex justify-between ml-2 w-full">
+                <p>{item.name}</p>
+                <p className="font-bold">#{item.itemsNumber}</p>
+              </span>
+            </Checkbox>
           ))
         ) : (
           <div>Nothing yet, Add something!</div>
