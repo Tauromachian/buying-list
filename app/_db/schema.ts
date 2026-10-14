@@ -1,27 +1,27 @@
 import { boolean, date, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
+export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
 });
 
-export const lists = pgTable("lists", {
+export const listsTable = pgTable("lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
   description: varchar({ length: 200 }),
 });
 
-export const usersLists = pgTable("users_lists", {
+export const usersListsTable = pgTable("users_lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   user_id: integer()
     .notNull()
-    .references(() => users.id),
+    .references(() => usersTable.id),
   list_id: integer()
     .notNull()
-    .references(() => lists.id),
+    .references(() => listsTable.id),
 });
 
-export const items = pgTable("items", {
+export const itemsTable = pgTable("items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 120 }).notNull(),
   quantity: integer().notNull().default(1),
