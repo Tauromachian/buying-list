@@ -8,7 +8,7 @@ export const usersTable = pgTable("users", {
 export const listsTable = pgTable("lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
-  created_at: date().notNull(),
+  created_at: date().notNull().defaultNow(),
   description: varchar({ length: 200 }),
 });
 
@@ -27,6 +27,6 @@ export const itemsTable = pgTable("items", {
   name: varchar({ length: 120 }).notNull(),
   quantity: integer().notNull().default(1),
   checked: boolean().notNull().default(false),
-  created_at: date().notNull(),
+  created_at: date().notNull().defaultNow(),
   checked_at: date().notNull(),
 });
