@@ -9,6 +9,13 @@ export async function GET(req: NextRequest) {
 
   let listId = searchParams.get("listId");
 
+  if (Number.isNaN(Number(listId))) {
+    return Response.json(
+      { msg: "List ID should be a number" },
+      { status: 400 },
+    );
+  }
+
   const items = await db
     .select()
     .from(itemsTable)
