@@ -59,7 +59,8 @@ async function postItem(item: Omit<Item, "id">): Promise<Item | undefined> {
 export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
 
-  const { listId } = useParams<{ listId: string }>();
+  const { id } = useParams<{ id: string }>();
+  const listId = id;
 
   useEffect(() => {
     async function run() {
