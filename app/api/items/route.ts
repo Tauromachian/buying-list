@@ -1,9 +1,18 @@
 import { db } from "@/app/_db";
 
 import { itemsTable } from "@/app/_db/schema";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
 
-export async function GET() {
-  const items = await db.select().from(itemsTable);
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+
+  let listId = searchParams.get("listId");
+
+  const items = await db
+    .select()
+    .from(itemsTable)
+    .where(listId ? eq(itemsTable.listId, Number(listId)) : undefined);
 
   return Response.json(items);
 }
