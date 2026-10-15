@@ -15,7 +15,6 @@ type Item = {
   listId: string;
   name: string;
   quantity: number;
-  description: string;
 };
 
 const BASE = "/api/items";
@@ -76,7 +75,6 @@ export default function Home() {
 
   const [name, setName] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-  const [description, setDescription] = useState<string>("");
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -98,7 +96,6 @@ export default function Home() {
     const item = await postItem({
       name,
       quantity,
-      description,
       listId,
     });
 
@@ -112,7 +109,6 @@ export default function Home() {
   function clearFields() {
     setName("");
     setQuantity(1);
-    setDescription("");
   }
 
   return (
@@ -140,12 +136,6 @@ export default function Home() {
               setState={setQuantity}
               type="number"
               min={1}
-            ></InputText>
-
-            <InputText
-              label="Description (optional)"
-              state={description}
-              setState={setDescription}
             ></InputText>
 
             <Button className="ml-auto">Submit</Button>
