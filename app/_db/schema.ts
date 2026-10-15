@@ -30,6 +30,9 @@ export const usersListsTable = pgTable("users_lists", {
 
 export const itemsTable = pgTable("items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  listId: integer("list_id")
+    .notNull()
+    .references(() => listsTable.id),
   name: varchar({ length: 120 }).notNull(),
   quantity: integer().notNull().default(1),
   checked: boolean().notNull().default(false),
