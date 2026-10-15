@@ -11,8 +11,6 @@ export async function GET() {
 export async function POST(req: Request) {
   const item = await req.json();
 
-  console.log(item);
-
   const [inserted] = await db.insert(itemsTable).values(item).returning();
 
   return Response.json(inserted);
