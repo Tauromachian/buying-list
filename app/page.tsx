@@ -148,6 +148,7 @@ export default function Home() {
     await deleteList(selectedList.id);
     loadData();
     setIsDeleteConfirmationDialogOpen(false);
+    setSelectedList(undefined);
   }
 
   function openDialog(type: "add" | "edit", list?: List) {
