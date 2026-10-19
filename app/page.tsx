@@ -7,6 +7,7 @@ import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
 import { Dialog } from "@/components/Dialog";
 import Link from "next/link";
+import { GeneralResNotOk } from "@/utils/errors";
 
 type List = {
   id: number;
@@ -36,7 +37,7 @@ async function postList(newList: FormList): Promise<List | undefined> {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) throw new GeneralResNotOk(res)
+    if (!res.ok) throw new GeneralResNotOk(res);
 
     const insertedList: List = await res.json();
     return insertedList;
@@ -53,7 +54,17 @@ async function patchList(list: List) {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) throw new GeneralResNotOk(res)
+    if (!res.ok) throw new GeneralResNotOk(res);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function deleteList(id: number) {
+  try {
+    const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
+
+    if (!res.ok) throw new GeneralResNotOk(res);
   } catch (error) {
     console.error(error);
   }
@@ -122,6 +133,11 @@ export default function Home() {
     }
   }
 
+  async function removeList(id: number) {
+    await deleteList(id);
+    loadData();
+  }
+
   function openDialog(type: "add" | "edit", list?: List) {
     if (type === "edit") {
       if (!list) {
@@ -143,7 +159,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-80 mx-auto mt-20">
+    <div className="w-140 mx-auto mt-20">
       <h1 className="mb-5 text-xl">Lists</h1>
       <Button className="ml-auto" onClick={() => openDialog("add")}>
         Create List
