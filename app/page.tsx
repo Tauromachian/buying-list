@@ -110,17 +110,18 @@ export default function Home() {
       </Dialog>
 
       <Card className="mt-7 flex flex-col gap-4">
-        <ul>
+        <ul className="flex flex-col gap-4">
           {lists.length ? (
             lists.map((list: List) => (
-              <li className="flex justify-between" key={list.id}>
+              <li className="flex justify-between items-center" key={list.id}>
                 <p>{list.name}</p>
                 <Link
                   href={`/list/${list.id}`}
-                  className="text-blue-400 underline"
+                  className="text-blue-400 underline ml-auto mr-4"
                 >
                   Go to list
                 </Link>
+                <Button>Edit</Button>
               </li>
             ))
           ) : (
