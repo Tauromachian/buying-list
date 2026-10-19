@@ -110,9 +110,7 @@ export default function Home() {
   }
 
   async function editList(formData: FormList) {
-    if (!selectedList) {
-      throw new Error("Set selectedList before trying to use this function");
-    }
+    assertList(selectedList);
 
     const data = { ...selectedList, ...formData };
 
