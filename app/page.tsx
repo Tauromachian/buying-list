@@ -18,6 +18,14 @@ type List = {
 
 type FormList = Omit<List, "id" | "createdAt">;
 
+function assertList(list?: List, msg?: string): asserts list is List {
+  msg ??= "This object should be of type List.";
+
+  if (!list) throw new Error(msg);
+
+  if (!list.id || !list.name) throw new Error(msg);
+}
+
 export async function loadLists() {
   try {
     const res = await fetch("/api/lists");
