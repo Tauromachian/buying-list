@@ -36,9 +36,7 @@ async function postList(newList: FormList): Promise<List | undefined> {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) {
-      throw new Error("Res not ok");
-    }
+    if (!res.ok) throw new GeneralResNotOk(res)
 
     const insertedList: List = await res.json();
     return insertedList;
@@ -55,9 +53,7 @@ async function patchList(list: List) {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) {
-      throw new Error("Res not ok");
-    }
+    if (!res.ok) throw new GeneralResNotOk(res)
   } catch (error) {
     console.error(error);
   }
