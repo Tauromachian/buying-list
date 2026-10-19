@@ -8,6 +8,7 @@ import { Card } from "@/components/Card";
 import { Dialog } from "@/components/Dialog";
 import Link from "next/link";
 import { GeneralResNotOk } from "@/utils/errors";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
 type List = {
   id: number;
@@ -98,6 +99,8 @@ export default function Home() {
   const [selectedList, setSelectedList] = useState<List>();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
+    useState<boolean>();
 
   async function addList(data: FormList) {
     const inserted = await postList(data);
@@ -139,9 +142,12 @@ export default function Home() {
     }
   }
 
-  async function removeList(id: number) {
-    await deleteList(id);
+  async function removeList() {
+    assertList(selectedList);
+
+    await deleteList(selectedList.id);
     loadData();
+    setIsDeleteConfirmationDialogOpen(false);
   }
 
   function openDialog(type: "add" | "edit", list?: List) {
@@ -157,6 +163,11 @@ export default function Home() {
     }
 
     setIsDialogOpen(true);
+  }
+
+  function openDeleteConfirmationDialog(list: List) {
+    setSelectedList(list);
+    setIsDeleteConfirmationDialogOpen(true);
   }
 
   function closeDialog() {
@@ -209,7 +220,9 @@ export default function Home() {
                     Go to list
                   </Link>
                   <Button onClick={() => openDialog("edit", list)}>Edit</Button>
-                  <Button onClick={() => removeList(list.id)}>Delete</Button>
+                  <Button onClick={() => openDeleteConfirmationDialog(list)}>
+                    Delete
+                  </Button>
                 </div>
               </li>
             ))
@@ -218,6 +231,11 @@ export default function Home() {
           )}
         </ul>
       </Card>
+
+      <DeleteConfirmationDialog
+        open={isDeleteConfirmationDialogOpen}
+        onDelete={() => removeList()}
+      ></DeleteConfirmationDialog>
     </div>
   );
 }
