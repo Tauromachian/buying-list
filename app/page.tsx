@@ -234,6 +234,7 @@ export default function Home() {
 
       <DeleteConfirmationDialog
         open={isDeleteConfirmationDialogOpen}
+        onClose={() => setIsDeleteConfirmationDialogOpen(false)}
         onDelete={() => removeList()}
       ></DeleteConfirmationDialog>
     </div>
