@@ -15,6 +15,8 @@ type List = {
   description?: string;
 };
 
+type FormList = Omit<List, "id" | "createdAt">;
+
 export async function loadLists() {
   try {
     const res = await fetch("/api/lists");
@@ -26,9 +28,7 @@ export async function loadLists() {
   }
 }
 
-async function postList(
-  newList: Omit<List, "id" | "createdAt">,
-): Promise<List | undefined> {
+async function postList(newList: FormList): Promise<List | undefined> {
   try {
     const res = await fetch("/api/lists", {
       method: "POST",
@@ -47,29 +47,44 @@ async function postList(
   }
 }
 
+async function patchList(list: List) {
+  try {
+    const res = await fetch(`/api/lists/${list.id}`, {
+      method: "PATCH",
+      body: JSON.stringify(list),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      throw new Error("Res not ok");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export default function Home() {
   const [lists, setLists] = useState<List[]>([]);
 
+  async function loadData() {
+    const lists = await loadLists();
+
+    if (!lists) return;
+
+    setLists(lists);
+  }
+
   useEffect(() => {
-    async function run() {
-      const lists = await loadLists();
-
-      if (!lists) return;
-
-      setLists(lists);
-    }
-
-    run();
+    loadData();
   }, []);
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-
-  let selectedList: List;
+  const [selectedList, setSelectedList] = useState<List>();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  async function addList(data: Omit<List, "id">) {
+  async function addList(data: FormList) {
     const inserted = await postList(data);
 
     if (!inserted) return;
@@ -77,6 +92,21 @@ export default function Home() {
     setLists((prev) => [...prev, inserted]);
     setIsDialogOpen(false);
     clearFields();
+  }
+
+  async function editList(formData: FormList) {
+    if (!selectedList) {
+      throw new Error("Set selectedList before trying to use this function");
+    }
+
+    const data = { ...selectedList, ...formData };
+
+    await patchList(data);
+
+    setIsDialogOpen(false);
+    clearFields();
+    setSelectedList(undefined);
+    loadData();
   }
 
   function clearFields() {
@@ -87,11 +117,12 @@ export default function Home() {
   function submit(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const form = new FormData(event.target);
-    const data = Object.fromEntries(form.entries()) as unknown as List;
+    const data: FormList = { name, description };
 
     if (!selectedList) {
       addList(data);
+    } else {
+      editList(data);
     }
   }
 
@@ -101,10 +132,18 @@ export default function Home() {
         throw new Error("Open dialog in edit mode should always have a list");
       }
 
-      selectedList = list;
+      setSelectedList(list);
+
+      setName(list.name);
+      setDescription(list.description ?? "");
     }
 
     setIsDialogOpen(true);
+  }
+
+  function closeDialog() {
+    setSelectedList(undefined);
+    setIsDialogOpen(false);
   }
 
   return (
@@ -114,7 +153,7 @@ export default function Home() {
         Create List
       </Button>
 
-      <Dialog open={isDialogOpen} onClose={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onClose={closeDialog}>
         <Card>
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
