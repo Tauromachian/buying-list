@@ -84,6 +84,17 @@ export default function Home() {
     setDescription("");
   }
 
+  function submit(event: React.SubmitEvent) {
+    event.preventDefault();
+
+    const form = new FormData(event.target);
+    const data = Object.fromEntries(form.entries()) as unknown as List;
+
+    if (!selectedList) {
+      addList(data);
+    }
+  }
+
   function openDialog(type: "add" | "edit", list?: List) {
     if (type === "edit") {
       if (!list) {
