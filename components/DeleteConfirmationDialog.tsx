@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { Button } from "./Button";
 import { Dialog } from "./Dialog";
 import { Card } from "./Card";
@@ -13,28 +11,15 @@ export function DeleteConfirmationDialog({
   onClose: (val: boolean) => void;
   onDelete: () => void;
 }) {
-  useEffect(() => {
-    if (!open) return;
-
-    setIsOpen(open);
-  }, [open]);
-
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  function close() {
-    setIsOpen(false);
-    onClose(false);
-  }
-
   return (
-    <Dialog open={isOpen} onClose={close}>
+    <Dialog open={open} onClose={close}>
       <Card>
         <p className="my-7">
           The resource will be deleted. This action is irreversible.
         </p>
 
         <div className="flex gap-4">
-          <Button className="ml-auto" onClick={() => setIsOpen(false)}>
+          <Button className="ml-auto" onClick={() => onClose(false)}>
             Cancel
           </Button>
           <Button onClick={onDelete}>Delete</Button>
