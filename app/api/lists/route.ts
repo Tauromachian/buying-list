@@ -13,5 +13,5 @@ export async function POST(req: Request) {
 
   const [inserted] = await db.insert(listsTable).values(list).returning();
 
-  return Response.json(inserted);
+  return Response.json(inserted, { status: 201 });
 }
