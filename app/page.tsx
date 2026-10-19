@@ -69,7 +69,8 @@ export default function Home() {
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-    const inserted = await postList({ name, description });
+  async function addList(data: Omit<List, "id">) {
+    const inserted = await postList(data);
 
     if (!inserted) return;
 
