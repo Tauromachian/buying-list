@@ -65,10 +65,9 @@ export default function Home() {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  let selectedList: List;
 
-  async function addList(event: React.SubmitEvent) {
-    event.preventDefault();
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
     const inserted = await postList({ name, description });
 
