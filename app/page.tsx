@@ -118,7 +118,7 @@ export default function Home() {
         <Card>
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
-          <form onSubmit={addList} className="flex flex-col gap-3">
+          <form onSubmit={submit} className="flex flex-col gap-3">
             <InputText label="Name" state={name} setState={setName}></InputText>
 
             <InputText
