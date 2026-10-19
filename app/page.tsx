@@ -84,6 +84,18 @@ export default function Home() {
     setDescription("");
   }
 
+  function openDialog(type: "add" | "edit", list?: List) {
+    if (type === "edit") {
+      if (!list) {
+        throw new Error("Open dialog in edit mode should always have a list");
+      }
+
+      selectedList = list;
+    }
+
+    setIsDialogOpen(true);
+  }
+
   return (
     <div className="w-80 mx-auto mt-20">
       <h1 className="mb-5 text-xl">Lists</h1>
