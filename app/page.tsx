@@ -179,13 +179,16 @@ export default function Home() {
             lists.map((list: List) => (
               <li className="flex justify-between items-center" key={list.id}>
                 <p>{list.name}</p>
-                <Link
-                  href={`/list/${list.id}`}
-                  className="text-blue-400 underline ml-auto mr-4"
-                >
-                  Go to list
-                </Link>
-                <Button onClick={() => openDialog("edit", list)}>Edit</Button>
+                <div className="flex gap-4 ml-auto items-center">
+                  <Link
+                    href={`/list/${list.id}`}
+                    className="text-blue-400 underline ml-auto mr-4"
+                  >
+                    Go to list
+                  </Link>
+                  <Button onClick={() => openDialog("edit", list)}>Edit</Button>
+                  <Button onClick={() => removeList(list.id)}>Delete</Button>
+                </div>
               </li>
             ))
           ) : (
