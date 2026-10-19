@@ -12,7 +12,7 @@ export function DeleteConfirmationDialog({
   onDelete: () => void;
 }) {
   return (
-    <Dialog open={open} onClose={close}>
+    <Dialog open={open} onClose={close} title="Delete list?">
       <Card>
         <p className="my-7">
           The resource will be deleted. This action is irreversible.

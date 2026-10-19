@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 
@@ -6,11 +6,15 @@ export function Dialog({
   children,
   open,
   onClose,
+  title,
 }: {
   children: React.ReactNode;
   open?: boolean;
   onClose?: (value: boolean) => void;
+  /** Dialog title. Rendered as a heading and exposed as the dialog's accessible name. */
+  title?: string;
 }) {
+  const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -34,11 +38,23 @@ export function Dialog({
       ref={dialogRef}
       closedby="any"
       onClose={close}
+      aria-labelledby={title ? titleId : undefined}
       className="m-auto rounded-md backdrop:bg-black backdrop:opacity-30 min-w-80"
     >
-      <Button onClick={close} className="absolute top-2 right-2" variant="icon">
+      <Button
+        onClick={close}
+        className="absolute top-2 right-2"
+        variant="icon"
+        label="Close"
+      >
         <Icon icon="mdi:close" className="text-danger-0"></Icon>
       </Button>
+
+      {title && (
+        <h2 id={titleId} className="text-md font-bold mb-4">
+          {title}
+        </h2>
+      )}
       {children}
     </dialog>
   );
