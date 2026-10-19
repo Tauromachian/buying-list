@@ -150,7 +150,7 @@ export default function Home() {
                 >
                   Go to list
                 </Link>
-                <Button>Edit</Button>
+                <Button onClick={() => openDialog("edit", list)}>Edit</Button>
               </li>
             ))
           ) : (
