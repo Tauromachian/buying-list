@@ -119,11 +119,17 @@ export default function Home() {
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
           <form onSubmit={submit} className="flex flex-col gap-3">
-            <InputText label="Name" state={name} setState={setName}></InputText>
+            <InputText
+              label="Name"
+              state={name}
+              setState={setName}
+              name="name"
+            ></InputText>
 
             <InputText
               label="Description (optional)"
               state={description}
+              name="description"
               setState={setDescription}
             ></InputText>
 
