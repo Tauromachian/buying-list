@@ -9,6 +9,8 @@ type ButtonProps = BaseComponent & {
   children: React.ReactNode;
   variant?: Variant;
   onClick?: () => void;
+  /** Accessible label. Recommended for icon-only buttons. */
+  label?: string;
 };
 
 function getClassesByVariant(variant: Variant) {
@@ -29,11 +31,13 @@ export function Button({
   children,
   onClick,
   className,
+  label,
   variant = "default",
 }: ButtonProps) {
   return (
     <button
       onClick={onClick}
+      aria-label={label}
       className={classesMerge(getClassesByVariant(variant), className)}
     >
       {children}
