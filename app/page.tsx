@@ -182,10 +182,12 @@ export default function Home() {
         Create List
       </Button>
 
-      <Dialog open={isDialogOpen} onClose={closeDialog}>
+      <Dialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        title={selectedList ? "Edit list" : "Add new list"}
+      >
         <Card>
-          <p className="text-md font-bold mb-4">Add new item to list</p>
-
           <form onSubmit={submit} className="flex flex-col gap-3">
             <InputText
               label="Name"
