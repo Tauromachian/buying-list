@@ -110,7 +110,7 @@ export default function Home() {
   return (
     <div className="w-80 mx-auto mt-20">
       <h1 className="mb-5 text-xl">Lists</h1>
-      <Button className="ml-auto" onClick={() => setIsDialogOpen(true)}>
+      <Button className="ml-auto" onClick={() => openDialog("add")}>
         Create List
       </Button>
 
