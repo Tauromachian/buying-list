@@ -3,19 +3,43 @@ import { db } from "@/app/_db";
 import { listsTable } from "@/app/_db/schema";
 
 import { eq } from "drizzle-orm";
+import { ListDTO } from "../../_dtos/list";
+import { flattenError } from "zod/v4/core";
 
 export async function PATCH(
   req: Request,
   ctx: RouteContext<"/api/lists/[id]">,
 ) {
-  const { id } = await ctx.params;
-  const list = await req.json();
+  try {
+    var reqData = await req.json();
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      {
+        message: "Data Invalid",
+        details: error instanceof Error ? error.message : "undefined",
+      },
+      { status: 400 },
+    );
+  }
 
-  if (list.id) delete list.id;
+  const { id } = await ctx.params;
+
+  const result = ListDTO.omit({ id: true, createdAt: true }).safeParse(reqData);
+
+  if (!result.success) {
+    return Response.json(
+      {
+        message: "Some of the fields aren't valid",
+        details: flattenError(result.error),
+      },
+      { status: 400 },
+    );
+  }
 
   await db
     .update(listsTable)
-    .set(list)
+    .set(result.data)
     .where(eq(listsTable.id, Number(id)));
 
   const res = new Response(null, { status: 204 });
