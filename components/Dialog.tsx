@@ -51,10 +51,11 @@ export function Dialog({
       </Button>
 
       {title && (
-        <p id={titleId} className="text-md font-bold mb-4">
+        <p id={titleId} className="text-md font-bold m-5">
           {title}
         </p>
       )}
+
       {children}
     </dialog>
   );
