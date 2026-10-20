@@ -2,28 +2,16 @@ import { eq } from "drizzle-orm";
 import { flattenError } from "zod";
 import { db } from "@/app/api/_db";
 import { listsTable } from "@/app/api/_db/schema";
+import { invalidId, parseId } from "@/app/api/_utils/ids";
 import { UpdateListDTO } from "@/lib/dto/list";
-
-function parseId(rawId: string): number | null {
-  const id = Number(rawId);
-
-  // Same contract as `ListDTO`'s `id`: a positive integer.
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
-function invalidId(rawId: string) {
-  return Response.json(
-    { message: `"${rawId}" is not a valid list id` },
-    { status: 400 },
-  );
-}
 
 export async function PATCH(
   req: Request,
   ctx: RouteContext<"/api/lists/[id]">,
 ) {
-  const id = parseId((await ctx.params).id);
-  if (!id) return invalidId((await ctx.params).id);
+  const { id: rawId } = await ctx.params;
+  const id = parseId(rawId);
+  if (!id) return invalidId(rawId, "list");
 
   let reqData: unknown;
   try {
@@ -66,8 +54,9 @@ export async function PATCH(
 }
 
 export async function DELETE(_: Request, ctx: RouteContext<"/api/lists/[id]">) {
-  const id = parseId((await ctx.params).id);
-  if (!id) return invalidId((await ctx.params).id);
+  const { id: rawId } = await ctx.params;
+  const id = parseId(rawId);
+  if (!id) return invalidId(rawId, "list");
 
   try {
     await db.delete(listsTable).where(eq(listsTable.id, id));
