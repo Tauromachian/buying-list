@@ -48,8 +48,8 @@ async function postList(newList: FormList): Promise<List | undefined> {
 
     if (!res.ok) throw new GeneralResNotOk(res);
 
-    const insertedList: List = await res.json();
-    return insertedList;
+    const { data } = await res.json();
+    return data;
   } catch (error) {
     console.warn(error);
   }
