@@ -25,6 +25,10 @@ export async function PATCH(
 export async function DELETE(_: Request, ctx: RouteContext<"/api/lists/[id]">) {
   const { id } = await ctx.params;
 
+  if (!id || Number.isNaN(Number(id))) {
+    return Response.json({ message: "ID should be number" }, { status: 400 });
+  }
+
   await db.delete(listsTable).where(eq(listsTable.id, Number(id)));
 
   const res = new Response(null, { status: 204 });
