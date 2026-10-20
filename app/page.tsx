@@ -10,12 +10,7 @@ import Link from "next/link";
 import { GeneralResNotOk } from "@/utils/errors";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
-type List = {
-  id: number;
-  name: string;
-  createdAt: string;
-  description?: string;
-};
+import type { List } from "@/lib/dto/list";
 
 type FormList = Omit<List, "id" | "createdAt">;
 

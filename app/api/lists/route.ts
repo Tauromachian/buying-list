@@ -1,31 +1,36 @@
+import { flattenError } from "zod";
 import { db } from "@/app/_db";
 
-import { flattenError } from "zod";
-
 import { listsTable } from "@/app/_db/schema";
-import { ListDTO } from "@/app/api/_dtos/list";
+import { CreateListDTO } from "@/lib/dto/list";
 
 export async function GET() {
-  const lists = await db.select().from(listsTable);
+  try {
+    const lists = await db.select().from(listsTable);
 
-  return Response.json(lists);
+    return Response.json(lists);
+  } catch (error) {
+    console.error("[GET /api/lists] DB failure:", error);
+    return Response.json({ message: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
+  let reqData: unknown;
   try {
-    var reqData = await req.json();
+    reqData = await req.json();
   } catch (error) {
-    console.error(error);
+    console.error("[POST /api/lists] Malformed JSON body:", error);
     return Response.json(
       {
-        message: "Data invalid",
+        message: "Data Invalid",
         details: error instanceof Error ? error.message : "undefined",
       },
       { status: 400 },
     );
   }
 
-  const result = ListDTO.omit({ id: true, createdAt: true }).safeParse(reqData);
+  const result = CreateListDTO.safeParse(reqData);
 
   if (!result.success) {
     return Response.json(
@@ -37,12 +42,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const list = result.data;
+  try {
+    const [inserted] = await db
+      .insert(listsTable)
+      .values(result.data)
+      .returning();
 
-  const [inserted] = await db.insert(listsTable).values(list).returning();
-
-  return Response.json(
-    { message: "Inserted successfully", data: inserted },
-    { status: 201 },
-  );
+    return Response.json({ data: inserted }, { status: 201 });
+  } catch (error) {
+    console.error("[POST /api/lists] DB failure:", error);
+    return Response.json({ message: "Internal server error" }, { status: 500 });
+  }
 }
