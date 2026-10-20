@@ -17,7 +17,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error);
     return Response.json(
-      { details: error instanceof Error ? error.message : "undefined" },
+      {
+        message: "Data invalid",
+        details: error instanceof Error ? error.message : "undefined",
+      },
       { status: 400 },
     );
   }
@@ -26,7 +29,10 @@ export async function POST(req: Request) {
 
   if (!result.success) {
     return Response.json(
-      { details: flattenError(result.error) },
+      {
+        message: "Some of the fields aren't valid",
+        details: flattenError(result.error),
+      },
       { status: 400 },
     );
   }
@@ -35,5 +41,8 @@ export async function POST(req: Request) {
 
   const [inserted] = await db.insert(listsTable).values(list).returning();
 
-  return Response.json({ data: inserted }, { status: 201 });
+  return Response.json(
+    { message: "Inserted successfully", data: inserted },
+    { status: 201 },
+  );
 }
