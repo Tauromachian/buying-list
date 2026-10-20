@@ -26,15 +26,13 @@ export async function GET(req: NextRequest) {
       .from(itemsTable)
       .where(listId ? eq(itemsTable.listId, listId) : undefined);
   } catch (error) {
-    if (error instanceof Error) {
-      return Response.json(
-        {
-          title: "DB Error",
-          msg: error.message,
-        },
-        { status: 500 },
-      );
-    }
+    console.error("[GET /api/items/:id] DB failure:", error);
+    return Response.json(
+      {
+        message: "Internal server error",
+      },
+      { status: 500 },
+    );
   }
 
   if (listId && !lists?.length) {
