@@ -1,7 +1,10 @@
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
+import { flattenError } from "zod";
+
 import { db } from "@/app/api/_db";
 import { itemsTable, listsTable } from "@/app/api/_db/schema";
+import { CreateItemDTO } from "@/lib/dto/item";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
@@ -48,9 +51,37 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: Request) {
-  const item = await req.json();
+  try {
+    var data = await req.json();
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      {
+        message: "Data invalid",
+        details: error instanceof Error ? error.message : undefined,
+      },
+      { status: 400 },
+    );
+  }
 
-  const [inserted] = await db.insert(itemsTable).values(item).returning();
+  const result = CreateItemDTO.safeParse(data);
+  if (!result.success) {
+    return Response.json(
+      {
+        message: "Some fields were invalid",
+        details: flattenError(result.error),
+      },
+      { status: 400 },
+    );
+  }
 
-  return Response.json(inserted, { status: 201 });
+  const item = result.data;
+
+  try {
+    const [inserted] = await db.insert(itemsTable).values(item).returning();
+    return Response.json({ data: inserted }, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return Response.json({ message: "Internal server error" }, { status: 500 });
+  }
 }
