@@ -51,9 +51,9 @@ export function Dialog({
       </Button>
 
       {title && (
-        <h2 id={titleId} className="text-md font-bold mb-4">
+        <p id={titleId} className="text-md font-bold mb-4">
           {title}
-        </h2>
+        </p>
       )}
       {children}
     </dialog>
