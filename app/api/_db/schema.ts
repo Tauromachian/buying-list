@@ -32,7 +32,7 @@ export const itemsTable = pgTable("items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   listId: integer("list_id")
     .notNull()
-    .references(() => listsTable.id),
+    .references(() => listsTable.id, { onDelete: "cascade" }),
   name: varchar({ length: 120 }).notNull(),
   quantity: integer().notNull().default(1),
   checked: boolean().notNull().default(false),
