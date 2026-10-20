@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   if (listId != null && Number.isNaN(listId)) {
     return Response.json(
-      { msg: "List ID should be a number" },
+      { message: "List ID should be a number" },
       { status: 400 },
     );
   }
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
   if (listId && !lists?.length) {
     return Response.json(
       {
-        msg: "List not found",
+        message: "List not found",
       },
       { status: 404 },
     );
