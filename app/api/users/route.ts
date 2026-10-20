@@ -1,6 +1,6 @@
-import { db } from "@/app/_db";
+import { db } from "@/app/api/_db";
 
-import { usersTable } from "@/app/_db/schema";
+import { usersTable } from "@/app/api/_db/schema";
 
 export async function GET() {
   const users = await db.select().from(usersTable);

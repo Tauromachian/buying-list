@@ -1,7 +1,7 @@
 import { flattenError } from "zod";
-import { db } from "@/app/_db";
+import { db } from "@/app/api/_db";
 
-import { listsTable } from "@/app/_db/schema";
+import { listsTable } from "@/app/api/_db/schema";
 import { CreateListDTO } from "@/lib/dto/list";
 
 export async function GET() {

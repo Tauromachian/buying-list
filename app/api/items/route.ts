@@ -1,8 +1,7 @@
-import { db } from "@/app/_db";
-
-import { itemsTable, listsTable } from "@/app/_db/schema";
 import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { db } from "@/app/api/_db";
+import { itemsTable, listsTable } from "@/app/api/_db/schema";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;

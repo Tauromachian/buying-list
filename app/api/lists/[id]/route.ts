@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { flattenError } from "zod";
-import { db } from "@/app/_db";
-import { listsTable } from "@/app/_db/schema";
+import { db } from "@/app/api/_db";
+import { listsTable } from "@/app/api/_db/schema";
 import { UpdateListDTO } from "@/lib/dto/list";
 
 function parseId(rawId: string): number | null {
