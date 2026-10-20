@@ -1,6 +1,9 @@
 import { db } from "@/app/_db";
 
+import { flattenError } from "zod";
+
 import { listsTable } from "@/app/_db/schema";
+import { ListDTO } from "@/app/api/_dtos/list";
 
 export async function GET() {
   const lists = await db.select().from(listsTable);
@@ -9,9 +12,28 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const list = await req.json();
+  try {
+    var reqData = await req.json();
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      { details: error instanceof Error ? error.message : "undefined" },
+      { status: 400 },
+    );
+  }
+
+  const result = ListDTO.omit({ id: true, createdAt: true }).safeParse(reqData);
+
+  if (!result.success) {
+    return Response.json(
+      { details: flattenError(result.error) },
+      { status: 400 },
+    );
+  }
+
+  const list = result.data;
 
   const [inserted] = await db.insert(listsTable).values(list).returning();
 
-  return Response.json(inserted, { status: 201 });
+  return Response.json({ data: inserted }, { status: 201 });
 }
