@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -11,26 +11,30 @@ import { InputText } from "@/components/InputText";
 import { createItem, getItems } from "@/lib/api/items";
 import type { CreateItem, Item } from "@/lib/dto/item";
 
+type ItemForm = Pick<CreateItem, "name" | "quantity">;
+
+const EMPTY_FORM: ItemForm = { name: "", quantity: 1 };
+
 export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
 
   const { id } = useParams<{ id: string }>();
   const listId = id;
 
-  useEffect(() => {
-    loadData(Number(listId));
-  }, [listId]);
-
-  async function loadData(listId: number) {
+  // Stable identity so the effect can safely list it as a dependency.
+  const loadData = useCallback(async (currentListId: number) => {
     try {
-      setItems(await getItems({ listId }));
+      setItems(await getItems({ listId: currentListId }));
     } catch (error) {
       console.error(error);
     }
-  }
+  }, []);
 
-  const [name, setName] = useState<string>("");
-  const [quantity, setQuantity] = useState<number>(1);
+  useEffect(() => {
+    loadData(Number(listId));
+  }, [loadData, listId]);
+
+  const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -50,8 +54,7 @@ export default function Home() {
     event.preventDefault();
 
     const data: CreateItem = {
-      name,
-      quantity,
+      ...form,
       listId: Number(listId),
       checked: false,
     };
@@ -61,15 +64,15 @@ export default function Home() {
 
       setItems((prev) => [...prev, item]);
       setIsDialogOpen(false);
-      clearFields();
+      setForm(EMPTY_FORM);
     } catch (error) {
       console.error(error);
     }
   }
 
-  function clearFields() {
-    setName("");
-    setQuantity(1);
+  function openAddItemDialog() {
+    setForm(EMPTY_FORM);
+    setIsDialogOpen(true);
   }
 
   return (
@@ -80,7 +83,7 @@ export default function Home() {
 
       <h1 className="mb-5 text-xl">List</h1>
 
-      <Button className="ml-auto" onClick={() => setIsDialogOpen(true)}>
+      <Button className="ml-auto" onClick={openAddItemDialog}>
         Add Item
       </Button>
 
@@ -89,12 +92,20 @@ export default function Home() {
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
           <form onSubmit={addItem} className="flex flex-col gap-3">
-            <InputText label="Name" state={name} setState={setName}></InputText>
+            <InputText
+              label="Name"
+              state={form.name}
+              setState={(name) => setForm((prev) => ({ ...prev, name }))}
+            ></InputText>
 
             <InputText
               label="Number"
-              state={quantity}
-              setState={setQuantity}
+              state={form.quantity}
+              // InputText always emits the raw DOM value (a string), even for
+              // type="number" — coerce explicitly so `quantity` stays a number.
+              setState={(quantity) =>
+                setForm((prev) => ({ ...prev, quantity: Number(quantity) }))
+              }
               type="number"
               min={1}
             ></InputText>

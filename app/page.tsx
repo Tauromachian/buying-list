@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -20,28 +20,30 @@ function assertList(list?: List, msg?: string): asserts list is List {
   if (!list.id || !list.name) throw new Error(msg);
 }
 
+const EMPTY_FORM: CreateList = { name: "", description: "" };
+
 export default function Home() {
   const [lists, setLists] = useState<List[]>([]);
 
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [form, setForm] = useState<CreateList>(EMPTY_FORM);
   const [selectedList, setSelectedList] = useState<List>();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
+  // Stable identity so the effect can safely list it as a dependency.
+  const loadData = useCallback(async () => {
     try {
       setLists(await getLists());
     } catch (error) {
       console.error(error);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   async function addList(data: CreateList) {
     try {
@@ -49,7 +51,7 @@ export default function Home() {
 
       setLists((prev) => [...prev, inserted]);
       setIsDialogOpen(false);
-      clearFields();
+      setForm(EMPTY_FORM);
     } catch (error) {
       console.error(error);
     }
@@ -62,7 +64,7 @@ export default function Home() {
       await updateList(selectedList.id, formData);
 
       setIsDialogOpen(false);
-      clearFields();
+      setForm(EMPTY_FORM);
       setSelectedList(undefined);
       await loadData();
     } catch (error) {
@@ -70,20 +72,13 @@ export default function Home() {
     }
   }
 
-  function clearFields() {
-    setName("");
-    setDescription("");
-  }
-
   function submit(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const data: CreateList = { name, description };
-
     if (!selectedList) {
-      addList(data);
+      addList(form);
     } else {
-      editList(data);
+      editList(form);
     }
   }
 
@@ -108,10 +103,12 @@ export default function Home() {
 
       setSelectedList(list);
 
-      setName(list.name);
-      setDescription(list.description ?? "");
+      setForm({
+        name: list.name,
+        description: list.description ?? "",
+      });
     } else {
-      clearFields();
+      setForm(EMPTY_FORM);
     }
 
     setIsDialogOpen(true);
@@ -143,16 +140,18 @@ export default function Home() {
           <form onSubmit={submit} className="flex flex-col gap-3">
             <InputText
               label="Name"
-              state={name}
-              setState={setName}
+              state={form.name}
+              setState={(name) => setForm((prev) => ({ ...prev, name }))}
               name="name"
             ></InputText>
 
             <InputText
               label="Description (optional)"
-              state={description}
+              state={form.description ?? ""}
               name="description"
-              setState={setDescription}
+              setState={(description) =>
+                setForm((prev) => ({ ...prev, description }))
+              }
             ></InputText>
 
             <Button className="ml-auto">Submit</Button>
