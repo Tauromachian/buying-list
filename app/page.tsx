@@ -11,6 +11,7 @@ import { InputText } from "@/components/InputText";
 
 import { createList, deleteList, getLists, updateList } from "@/lib/api/lists";
 import type { CreateList, List } from "@/lib/dto/list";
+import { Loader } from "@/components/Loader";
 
 function assertList(list?: List, msg?: string): asserts list is List {
   msg ??= "This object should be of type List.";
@@ -27,6 +28,7 @@ export default function Home() {
 
   const [form, setForm] = useState<CreateList>(EMPTY_FORM);
   const [selectedList, setSelectedList] = useState<List>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
@@ -37,11 +39,15 @@ export default function Home() {
   }, []);
 
   const loadData = async function () {
+    setIsLoading(true);
+
     try {
       setLists(await getLists());
     } catch (error) {
       console.error(error);
     }
+
+    setIsLoading(false);
   };
 
   async function addList(data: CreateList) {
@@ -159,29 +165,35 @@ export default function Home() {
       </Dialog>
 
       <Card className="mt-7 flex flex-col gap-4">
-        <ul className="flex flex-col gap-4">
-          {lists.length ? (
-            lists.map((list: List) => (
-              <li className="flex justify-between items-center" key={list.id}>
-                <p>{list.name}</p>
-                <div className="flex gap-4 ml-auto items-center">
-                  <Link
-                    href={`/list/${list.id}`}
-                    className="text-blue-400 underline ml-auto mr-4"
-                  >
-                    Go to list
-                  </Link>
-                  <Button onClick={() => openDialog("edit", list)}>Edit</Button>
-                  <Button onClick={() => openDeleteConfirmationDialog(list)}>
-                    Delete
-                  </Button>
-                </div>
-              </li>
-            ))
-          ) : (
-            <li>Nothing yet, Add something!</li>
-          )}
-        </ul>
+        {isLoading ? (
+          <Loader size="md"></Loader>
+        ) : (
+          <ul className="flex flex-col gap-4">
+            {lists.length ? (
+              lists.map((list: List) => (
+                <li className="flex justify-between items-center" key={list.id}>
+                  <p>{list.name}</p>
+                  <div className="flex gap-4 ml-auto items-center">
+                    <Link
+                      href={`/list/${list.id}`}
+                      className="text-blue-400 underline ml-auto mr-4"
+                    >
+                      Go to list
+                    </Link>
+                    <Button onClick={() => openDialog("edit", list)}>
+                      Edit
+                    </Button>
+                    <Button onClick={() => openDeleteConfirmationDialog(list)}>
+                      Delete
+                    </Button>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li>Nothing yet, Add something!</li>
+            )}
+          </ul>
+        )}
       </Card>
 
       <DeleteConfirmationDialog
