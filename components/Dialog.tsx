@@ -44,7 +44,7 @@ export function Dialog({
       <Button
         onClick={close}
         className="absolute top-2 right-2"
-        variant="icon"
+        icon
         label="Close"
       >
         <Icon icon="mdi:close" className="text-danger-0"></Icon>
