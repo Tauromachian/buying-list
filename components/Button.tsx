@@ -3,28 +3,33 @@ import { cva } from "class-variance-authority";
 import { BaseComponent } from "@/types/Component";
 import { classesMerge } from "@/utils/component-classes";
 
-type Variant = "default" | "icon";
+type Variant = "default" | "outlined";
 
 type ButtonProps = BaseComponent & {
   children: React.ReactNode;
   variant?: Variant;
   onClick?: () => void;
-  /** Accessible label. Recommended for icon-only buttons. */
   label?: string;
+  icon?: boolean;
 };
 
-function getClassesByVariant(variant: Variant) {
+function getClasses(variant: Variant, icon?: boolean) {
+  // Last classes win in `classesMerge`, so `icon` overrides fills from the
+  // chosen variant.
   const buttonVariants = cva("cursor-pointer", {
     variants: {
       variant: {
         default: "rounded bg-accent-0 px-4 py-2",
-        icon: "bg-transparent rounded-full flex justify-center items-center outline-none",
+        outlined: "rounded bg-transparent border-2 border-gray-0 px-4 py-2",
+      },
+      icon: {
+        true: "rounded-full bg-transparent flex justify-center items-center outline-none",
       },
     },
-    defaultVariants: { variant: "default" },
+    defaultVariants: { variant: "default", icon: false },
   });
 
-  return buttonVariants({ variant });
+  return buttonVariants({ variant, icon });
 }
 
 export function Button({
@@ -33,12 +38,13 @@ export function Button({
   className,
   label,
   variant = "default",
+  icon,
 }: ButtonProps) {
   return (
     <button
       onClick={onClick}
       aria-label={label}
-      className={classesMerge(getClassesByVariant(variant), className)}
+      className={classesMerge(getClasses(variant, icon), className)}
     >
       {children}
     </button>
