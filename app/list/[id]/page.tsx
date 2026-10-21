@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -21,18 +21,17 @@ export default function Home() {
   const { id } = useParams<{ id: string }>();
   const listId = id;
 
-  // Stable identity so the effect can safely list it as a dependency.
-  const loadData = useCallback(async (currentListId: number) => {
+  useEffect(() => {
+    loadData(Number(listId));
+  }, [listId]);
+
+  const loadData = async function (currentListId: number) {
     try {
       setItems(await getItems({ listId: currentListId }));
     } catch (error) {
       console.error(error);
     }
-  }, []);
-
-  useEffect(() => {
-    loadData(Number(listId));
-  }, [loadData, listId]);
+  };
 
   const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -32,18 +32,17 @@ export default function Home() {
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
 
-  // Stable identity so the effect can safely list it as a dependency.
-  const loadData = useCallback(async () => {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async function () {
     try {
       setLists(await getLists());
     } catch (error) {
       console.error(error);
     }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  };
 
   async function addList(data: CreateList) {
     try {
