@@ -10,6 +10,7 @@ import { Dialog } from "@/components/Dialog";
 import { InputText } from "@/components/InputText";
 import { createItem, getItems } from "@/lib/api/items";
 import type { CreateItem, Item } from "@/lib/dto/item";
+import { Loader } from "@/components/Loader";
 
 type ItemForm = Pick<CreateItem, "name" | "quantity">;
 
@@ -25,19 +26,23 @@ export default function Home() {
     loadData(Number(listId));
   }, [listId]);
 
+  const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [activeItems, setActiveItems] = useState<string[]>([]);
+
   const loadData = async function (currentListId: number) {
+    setIsLoading(true);
+
     try {
       setItems(await getItems({ listId: currentListId }));
     } catch (error) {
       console.error(error);
     }
+
+    setIsLoading(false);
   };
-
-  const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
-
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-
-  const [activeItems, setActiveItems] = useState<string[]>([]);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -115,7 +120,9 @@ export default function Home() {
       </Dialog>
 
       <Card className="mt-7 flex flex-col gap-4">
-        {items.length ? (
+        {isLoading ? (
+          <Loader size="md"></Loader>
+        ) : items.length ? (
           items.map((item: Item) => (
             <Checkbox
               key={item.id}
