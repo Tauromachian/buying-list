@@ -93,11 +93,13 @@ export default function Home() {
   async function addItem(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const item = await postItem({
+    const createItem = {
       name,
       quantity,
-      listId,
-    });
+      listId: Number(listId),
+    };
+
+    const item = await postItem(createItem);
 
     if (!item) return;
 
