@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -61,6 +61,21 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
+  const [search, setSearch] = useState<string>("");
+
+  const filteredLists = useMemo<List[]>(() => {
+    if (!search) return lists;
+
+    const newLists = [];
+
+    for (const list of lists) {
+      if (list.name.includes(search)) {
+        newLists.push(list);
+      }
+    }
+
+    return newLists;
+  }, [lists, search]);
 
   useEffect(() => {
     loadData();
@@ -173,16 +188,23 @@ export default function Home() {
     content = <EmptyState />;
   } else {
     content = (
-      <ul className="flex flex-col gap-4">
-        {lists.map((list) => (
-          <ListRow
-            key={list.id}
-            list={list}
-            onEdit={(list) => openDialog("edit", list)}
-            onDelete={openDeleteConfirmationDialog}
-          />
-        ))}
-      </ul>
+      <div>
+        <InputText
+          setState={(search) => setSearch(search as string)}
+          placeholder="Search"
+        ></InputText>
+
+        <ul className="flex flex-col gap-4 mt-5">
+          {filteredLists.map((list) => (
+            <ListRow
+              key={list.id}
+              list={list}
+              onEdit={(list) => openDialog("edit", list)}
+              onDelete={openDeleteConfirmationDialog}
+            />
+          ))}
+        </ul>
+      </div>
     );
   }
 
