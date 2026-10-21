@@ -12,7 +12,7 @@ import { useParams } from "next/navigation";
 
 type Item = {
   id: string;
-  listId: string;
+  listId: number;
   name: string;
   quantity: number;
 };
