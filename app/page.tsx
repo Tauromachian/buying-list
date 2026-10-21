@@ -168,7 +168,7 @@ export default function Home() {
       </div>
     );
   } else if (isLoading) {
-    content = <Loader size="md"></Loader>;
+    content = <Loader size="md" className="my-10"></Loader>;
   } else if (lists.length === 0) {
     content = <EmptyState />;
   } else {
