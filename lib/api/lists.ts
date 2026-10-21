@@ -9,12 +9,12 @@
  */
 
 import type { CreateList, List, UpdateList } from "@/lib/dto/list";
-import { assertOk } from "./_utils";
+import { handleResponseError } from "./_utils";
 
 /** GET /api/lists */
 export async function getLists(): Promise<List[]> {
   const res = await fetch("/api/lists");
-  assertOk(res);
+  handleResponseError(res);
   return res.json();
 }
 
@@ -25,7 +25,7 @@ export async function createList(data: CreateList): Promise<List> {
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
   });
-  assertOk(res);
+  handleResponseError(res);
 
   const { data: inserted } = (await res.json()) as { data: List };
   return inserted;
@@ -38,11 +38,11 @@ export async function updateList(id: number, data: UpdateList): Promise<void> {
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
   });
-  assertOk(res);
+  handleResponseError(res);
 }
 
 /** DELETE /api/lists/[id] */
 export async function deleteList(id: number): Promise<void> {
   const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
-  assertOk(res);
+  handleResponseError(res);
 }

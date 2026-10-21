@@ -11,7 +11,7 @@ export const metadata: Metadata = {
  * Landing page for API server errors (5xx).
  *
  * Since the data is fetched from client components, the `error.tsx`
- * boundary never fires for failed `fetch` calls — instead `assertOk`
+ * boundary never fires for failed `fetch` calls — instead `handleResponseError`
  * (in `lib/api/_utils.ts`) navigates here on any 5xx response.
  */
 export default function ServerErrorPage() {

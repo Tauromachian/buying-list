@@ -6,6 +6,7 @@ import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Checkbox } from "@/components/Checkbox";
+import { EmptyState } from "@/components/EmptyState";
 import { Dialog } from "@/components/Dialog";
 import { InputText } from "@/components/InputText";
 import { createItem, getItems } from "@/lib/api/items";
@@ -15,6 +16,33 @@ import { Loader } from "@/components/Loader";
 type ItemForm = Pick<CreateItem, "name" | "quantity">;
 
 const EMPTY_FORM: ItemForm = { name: "", quantity: 1 };
+
+function ItemRow({
+  item,
+  activeItems,
+  setActiveItems,
+}: {
+  item: Item;
+  activeItems: string[];
+  setActiveItems: (ids: string[]) => void;
+}) {
+  const itemId = String(item.id);
+
+  return (
+    <Checkbox
+      id={itemId}
+      value={itemId}
+      state={activeItems}
+      setState={setActiveItems}
+      hasStrikeThrough
+    >
+      <span className="flex justify-between ml-2 w-full">
+        <p>{item.name}</p>
+        <p className="font-bold">#{item.quantity}</p>
+      </span>
+    </Checkbox>
+  );
+}
 
 export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
@@ -28,17 +56,20 @@ export default function Home() {
 
   const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [activeItems, setActiveItems] = useState<string[]>([]);
 
   const loadData = async function (currentListId: number) {
     setIsLoading(true);
+    setLoadError(null);
 
     try {
       setItems(await getItems({ listId: currentListId }));
     } catch (error) {
       console.error(error);
+      setLoadError("Couldn't load items.");
     }
 
     setIsLoading(false);
@@ -77,6 +108,29 @@ export default function Home() {
   function openAddItemDialog() {
     setForm(EMPTY_FORM);
     setIsDialogOpen(true);
+  }
+
+  let content: React.ReactNode;
+  if (loadError) {
+    content = (
+      <div className="flex flex-col items-center gap-3" role="alert">
+        <p>{loadError}</p>
+        <Button onClick={() => loadData(Number(listId))}>Try again</Button>
+      </div>
+    );
+  } else if (isLoading) {
+    content = <Loader size="md"></Loader>;
+  } else if (items.length === 0) {
+    content = <EmptyState />;
+  } else {
+    content = items.map((item) => (
+      <ItemRow
+        key={item.id}
+        item={item}
+        activeItems={activeItems}
+        setActiveItems={setActiveItems}
+      />
+    ));
   }
 
   return (
@@ -119,29 +173,7 @@ export default function Home() {
         </Card>
       </Dialog>
 
-      <Card className="mt-7 flex flex-col gap-4">
-        {isLoading ? (
-          <Loader size="md"></Loader>
-        ) : items.length ? (
-          items.map((item: Item) => (
-            <Checkbox
-              key={item.id}
-              id={String(item.id)}
-              value={String(item.id)}
-              state={activeItems}
-              setState={setActiveItems}
-              hasStrikeThrough
-            >
-              <span className="flex justify-between ml-2 w-full">
-                <p>{item.name}</p>
-                <p className="font-bold">#{item.quantity}</p>
-              </span>
-            </Checkbox>
-          ))
-        ) : (
-          <div>Nothing yet, Add something!</div>
-        )}
-      </Card>
+      <Card className="mt-7 flex flex-col gap-4">{content}</Card>
     </div>
   );
 }

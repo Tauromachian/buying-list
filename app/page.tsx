@@ -7,6 +7,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { Dialog } from "@/components/Dialog";
+import { EmptyState } from "@/components/EmptyState";
 import { InputText } from "@/components/InputText";
 
 import { createList, deleteList, getLists, updateList } from "@/lib/api/lists";
@@ -23,12 +24,39 @@ function assertList(list?: List, msg?: string): asserts list is List {
 
 const EMPTY_FORM: CreateList = { name: "", description: "" };
 
+function ListRow({
+  list,
+  onEdit,
+  onDelete,
+}: {
+  list: List;
+  onEdit: (list: List) => void;
+  onDelete: (list: List) => void;
+}) {
+  return (
+    <li className="flex justify-between items-center">
+      <p>{list.name}</p>
+      <div className="flex gap-4 ml-auto items-center">
+        <Link
+          href={`/list/${list.id}`}
+          className="text-blue-400 underline ml-auto mr-4"
+        >
+          Go to list
+        </Link>
+        <Button onClick={() => onEdit(list)}>Edit</Button>
+        <Button onClick={() => onDelete(list)}>Delete</Button>
+      </div>
+    </li>
+  );
+}
+
 export default function Home() {
   const [lists, setLists] = useState<List[]>([]);
 
   const [form, setForm] = useState<CreateList>(EMPTY_FORM);
   const [selectedList, setSelectedList] = useState<List>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
@@ -40,11 +68,13 @@ export default function Home() {
 
   const loadData = async function () {
     setIsLoading(true);
+    setLoadError(null);
 
     try {
       setLists(await getLists());
     } catch (error) {
       console.error(error);
+      setLoadError("Couldn't load lists.");
     }
 
     setIsLoading(false);
@@ -129,6 +159,33 @@ export default function Home() {
     setIsDialogOpen(false);
   }
 
+  let content: React.ReactNode;
+  if (loadError) {
+    content = (
+      <div className="flex flex-col items-center gap-3" role="alert">
+        <p>{loadError}</p>
+        <Button onClick={() => loadData()}>Try again</Button>
+      </div>
+    );
+  } else if (isLoading) {
+    content = <Loader size="md"></Loader>;
+  } else if (lists.length === 0) {
+    content = <EmptyState />;
+  } else {
+    content = (
+      <ul className="flex flex-col gap-4">
+        {lists.map((list) => (
+          <ListRow
+            key={list.id}
+            list={list}
+            onEdit={(list) => openDialog("edit", list)}
+            onDelete={openDeleteConfirmationDialog}
+          />
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <div className="w-140 mx-auto mt-20">
       <h1 className="mb-5 text-xl">Lists</h1>
@@ -164,37 +221,7 @@ export default function Home() {
         </Card>
       </Dialog>
 
-      <Card className="mt-7 flex flex-col gap-4">
-        {isLoading ? (
-          <Loader size="md"></Loader>
-        ) : (
-          <ul className="flex flex-col gap-4">
-            {lists.length ? (
-              lists.map((list: List) => (
-                <li className="flex justify-between items-center" key={list.id}>
-                  <p>{list.name}</p>
-                  <div className="flex gap-4 ml-auto items-center">
-                    <Link
-                      href={`/list/${list.id}`}
-                      className="text-blue-400 underline ml-auto mr-4"
-                    >
-                      Go to list
-                    </Link>
-                    <Button onClick={() => openDialog("edit", list)}>
-                      Edit
-                    </Button>
-                    <Button onClick={() => openDeleteConfirmationDialog(list)}>
-                      Delete
-                    </Button>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <li>Nothing yet, Add something!</li>
-            )}
-          </ul>
-        )}
-      </Card>
+      <Card className="mt-7 flex flex-col gap-4">{content}</Card>
 
       <DeleteConfirmationDialog
         open={isDeleteConfirmationDialogOpen}

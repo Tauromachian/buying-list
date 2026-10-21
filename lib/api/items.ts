@@ -8,7 +8,7 @@
  * from `lib/dto` so the zod schemas never reach the client bundle.
  */
 import type { CreateItem, Item } from "@/lib/dto/item";
-import { assertOk } from "./_utils";
+import { handleResponseError } from "./_utils";
 
 /** GET /api/items?listId=… (optional filters) */
 export async function getItems(filters?: {
@@ -25,7 +25,7 @@ export async function getItems(filters?: {
   }
 
   const res = await fetch(endpoint);
-  assertOk(res);
+  handleResponseError(res);
   return res.json();
 }
 
@@ -36,7 +36,7 @@ export async function createItem(data: CreateItem): Promise<Item> {
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
   });
-  assertOk(res);
+  handleResponseError(res);
 
   const { data: inserted } = (await res.json()) as { data: Item };
   return inserted;
