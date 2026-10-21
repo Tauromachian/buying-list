@@ -110,6 +110,8 @@ export default function Home() {
 
       setName(list.name);
       setDescription(list.description ?? "");
+    } else {
+      clearFields();
     }
 
     setIsDialogOpen(true);
