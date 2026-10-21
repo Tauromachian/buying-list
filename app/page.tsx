@@ -1,18 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/Button";
-import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
-import { Dialog } from "@/components/Dialog";
-import Link from "next/link";
-import { GeneralResNotOk } from "@/utils/errors";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
+import { Dialog } from "@/components/Dialog";
+import { InputText } from "@/components/InputText";
 
-import type { List } from "@/lib/dto/list";
-
-type FormList = Omit<List, "id" | "createdAt">;
+import { createList, deleteList, getLists, updateList } from "@/lib/api/lists";
+import type { CreateList, List } from "@/lib/dto/list";
 
 function assertList(list?: List, msg?: string): asserts list is List {
   msg ??= "This object should be of type List.";
@@ -22,72 +20,8 @@ function assertList(list?: List, msg?: string): asserts list is List {
   if (!list.id || !list.name) throw new Error(msg);
 }
 
-export async function loadLists() {
-  try {
-    const res = await fetch("/api/lists");
-    const data = await res.json();
-
-    return data;
-  } catch (error) {
-    console.warn(error);
-  }
-}
-
-async function postList(newList: FormList): Promise<List | undefined> {
-  try {
-    const res = await fetch("/api/lists", {
-      method: "POST",
-      body: JSON.stringify(newList),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) throw new GeneralResNotOk(res);
-
-    const { data } = await res.json();
-    return data;
-  } catch (error) {
-    console.warn(error);
-  }
-}
-
-async function patchList(list: List) {
-  try {
-    const res = await fetch(`/api/lists/${list.id}`, {
-      method: "PATCH",
-      body: JSON.stringify(list),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) throw new GeneralResNotOk(res);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-export async function deleteList(id: number) {
-  try {
-    const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
-
-    if (!res.ok) throw new GeneralResNotOk(res);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export default function Home() {
   const [lists, setLists] = useState<List[]>([]);
-
-  async function loadData() {
-    const lists = await loadLists();
-
-    if (!lists) return;
-
-    setLists(lists);
-  }
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -97,27 +31,43 @@ export default function Home() {
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
 
-  async function addList(data: FormList) {
-    const inserted = await postList(data);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    if (!inserted) return;
-
-    setLists((prev) => [...prev, inserted]);
-    setIsDialogOpen(false);
-    clearFields();
+  async function loadData() {
+    try {
+      setLists(await getLists());
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  async function editList(formData: FormList) {
+  async function addList(data: CreateList) {
+    try {
+      const inserted = await createList(data);
+
+      setLists((prev) => [...prev, inserted]);
+      setIsDialogOpen(false);
+      clearFields();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function editList(formData: CreateList) {
     assertList(selectedList);
 
-    const data = { ...selectedList, ...formData };
+    try {
+      await updateList(selectedList.id, formData);
 
-    await patchList(data);
-
-    setIsDialogOpen(false);
-    clearFields();
-    setSelectedList(undefined);
-    loadData();
+      setIsDialogOpen(false);
+      clearFields();
+      setSelectedList(undefined);
+      await loadData();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function clearFields() {
@@ -128,7 +78,7 @@ export default function Home() {
   function submit(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const data: FormList = { name, description };
+    const data: CreateList = { name, description };
 
     if (!selectedList) {
       addList(data);
@@ -140,10 +90,14 @@ export default function Home() {
   async function removeList() {
     assertList(selectedList);
 
-    await deleteList(selectedList.id);
-    loadData();
-    setIsDeleteConfirmationDialogOpen(false);
-    setSelectedList(undefined);
+    try {
+      await deleteList(selectedList.id);
+      await loadData();
+      setIsDeleteConfirmationDialogOpen(false);
+      setSelectedList(undefined);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function openDialog(type: "add" | "edit", list?: List) {

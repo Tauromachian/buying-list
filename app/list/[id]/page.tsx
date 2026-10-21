@@ -1,59 +1,15 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
-import { InputText } from "@/components/InputText";
 import { Card } from "@/components/Card";
 import { Checkbox } from "@/components/Checkbox";
 import { Dialog } from "@/components/Dialog";
-import { Breadcrumbs, BreadcrumbItem } from "@/components/Breadcrumbs";
-import { useParams } from "next/navigation";
-
-type Item = {
-  id: string;
-  listId: number;
-  name: string;
-  quantity: number;
-};
-
-const BASE = "/api/items";
-
-async function loadItems(filters?: {
-  listId: string;
-}): Promise<Item[] | undefined> {
-  let endpoint = BASE;
-
-  if (filters) {
-    endpoint += "?" + new URLSearchParams(filters).toString();
-  }
-
-  try {
-    const res = await fetch(endpoint);
-
-    const items = await res.json();
-
-    return items;
-  } catch (error) {
-    console.warn(error);
-  }
-}
-
-async function postItem(item: Omit<Item, "id">): Promise<Item | undefined> {
-  try {
-    const res = await fetch(BASE, {
-      method: "POST",
-      body: JSON.stringify(item),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const insertedItem: Item = await res.json();
-
-    return insertedItem;
-  } catch (error) {
-    console.error(error);
-  }
-}
+import { InputText } from "@/components/InputText";
+import { createItem, getItems } from "@/lib/api/items";
+import type { CreateItem, Item } from "@/lib/dto/item";
 
 export default function Home() {
   const [items, setItems] = useState<Item[]>([]);
@@ -62,16 +18,16 @@ export default function Home() {
   const listId = id;
 
   useEffect(() => {
-    async function run() {
-      const items = await loadItems({ listId });
+    loadData(Number(listId));
+  }, [listId]);
 
-      if (!items) return;
-
-      setItems(items);
+  async function loadData(listId: number) {
+    try {
+      setItems(await getItems({ listId }));
+    } catch (error) {
+      console.error(error);
     }
-
-    run();
-  }, []);
+  }
 
   const [name, setName] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -93,19 +49,22 @@ export default function Home() {
   async function addItem(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const createItem = {
+    const data: CreateItem = {
       name,
       quantity,
       listId: Number(listId),
+      checked: false,
     };
 
-    const item = await postItem(createItem);
+    try {
+      const item = await createItem(data);
 
-    if (!item) return;
-
-    setItems([...items, item]);
-    setIsDialogOpen(false);
-    clearFields();
+      setItems((prev) => [...prev, item]);
+      setIsDialogOpen(false);
+      clearFields();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function clearFields() {
@@ -150,8 +109,8 @@ export default function Home() {
           items.map((item: Item) => (
             <Checkbox
               key={item.id}
-              id={item.id}
-              value={item.id}
+              id={String(item.id)}
+              value={String(item.id)}
               state={activeItems}
               setState={setActiveItems}
               hasStrikeThrough
