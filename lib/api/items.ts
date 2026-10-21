@@ -10,7 +10,7 @@
 import type { CreateItem, Item } from "@/lib/dto/item";
 import { handleResponseError } from "./_utils";
 
-/** GET /api/items?listId=… (optional filters) */
+/** GET /api/items?listId=… (optional filters) — `{ data: … }` envelope. */
 export async function getItems(filters?: {
   listId: string | number;
 }): Promise<Item[]> {
@@ -26,7 +26,9 @@ export async function getItems(filters?: {
 
   const res = await fetch(endpoint);
   handleResponseError(res);
-  return res.json();
+
+  const { data } = (await res.json()) as { data: Item[] };
+  return data;
 }
 
 /** POST /api/items — expects the `{ data: … }` envelope. */

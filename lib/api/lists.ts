@@ -11,11 +11,13 @@
 import type { CreateList, List, UpdateList } from "@/lib/dto/list";
 import { handleResponseError } from "./_utils";
 
-/** GET /api/lists */
+/** GET /api/lists — responds with the `{ data: … }` envelope. */
 export async function getLists(): Promise<List[]> {
   const res = await fetch("/api/lists");
   handleResponseError(res);
-  return res.json();
+
+  const { data } = (await res.json()) as { data: List[] };
+  return data;
 }
 
 /** POST /api/lists — expects the `{ data: … }` envelope. */

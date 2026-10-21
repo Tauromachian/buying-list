@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  return Response.json(items);
+  return Response.json({ data: items });
 }
 
 export async function POST(req: Request) {

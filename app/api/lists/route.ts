@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const lists = await db.select().from(listsTable);
 
-    return Response.json(lists);
+    return Response.json({ data: lists });
   } catch (error) {
     console.error("[GET /api/lists] DB failure:", error);
     return Response.json({ message: "Internal server error" }, { status: 500 });
