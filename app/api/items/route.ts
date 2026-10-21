@@ -64,7 +64,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const result = CreateItemDTO.safeParse(data);
+  const result = CreateItemDTO.safeParse({
+    ...data,
+    checked: data?.checked ?? false,
+  });
   if (!result.success) {
     return Response.json(
       {
