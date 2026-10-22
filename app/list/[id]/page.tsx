@@ -63,11 +63,11 @@ function ItemRow({
       <p className="font-bold ml-auto mr-3">#{item.quantity}</p>
 
       <Menu
-        activator={(popoverTarget) => (
-          <Button variant="outlined" icon popoverTarget={popoverTarget}>
+        activator={
+          <Button variant="outlined" icon>
             <Icon icon="mdi:dots-vertical"></Icon>
           </Button>
-        )}
+        }
       >
         <Button variant="text" onClick={onClickEdit}>
           Edit
