@@ -17,6 +17,7 @@ import { createItem, getItems, deleteItem, updateItem } from "@/lib/api/items";
 import type { CreateItem, Item } from "@/lib/dto/item";
 import { Icon } from "@/components/Icon";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
+import { toast } from "react-toastify";
 
 function assertItem(item?: Item, msg?: string): asserts item is Item {
   msg ??= "This object should be of type Item.";
@@ -141,8 +142,10 @@ export default function Home() {
       setItems((prev) => [...prev, inserted]);
       setIsDialogOpen(false);
       setForm({ ...EMPTY_FORM, listId: Number(listId) });
+      toast.success("Item added!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't add the item.");
     }
   }
 
@@ -156,8 +159,10 @@ export default function Home() {
       setForm(EMPTY_FORM);
       setSelectedItem(undefined);
       await loadData(Number(listId));
+      toast.success("Item updated!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't update the item.");
     }
   }
 
@@ -194,8 +199,10 @@ export default function Home() {
       await loadData(Number(listId));
       setIsDeleteConfirmationDialogOpen(false);
       setSelectedItem(undefined);
+      toast.success("Item deleted!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't delete the item.");
     }
   }
 

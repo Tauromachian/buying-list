@@ -13,6 +13,7 @@ import { InputText } from "@/components/InputText";
 import { createList, deleteList, getLists, updateList } from "@/lib/api/lists";
 import type { CreateList, List } from "@/lib/dto/list";
 import { Loader } from "@/components/Loader";
+import { toast } from "react-toastify";
 
 function assertList(list?: List, msg?: string): asserts list is List {
   msg ??= "This object should be of type List.";
@@ -102,8 +103,10 @@ export default function Home() {
       setLists((prev) => [...prev, inserted]);
       setIsDialogOpen(false);
       setForm(EMPTY_FORM);
+      toast.success("List created!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't create the list.");
     }
   }
 
@@ -117,8 +120,10 @@ export default function Home() {
       setForm(EMPTY_FORM);
       setSelectedList(undefined);
       await loadData();
+      toast.success("List updated!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't update the list.");
     }
   }
 
@@ -140,8 +145,10 @@ export default function Home() {
       await loadData();
       setIsDeleteConfirmationDialogOpen(false);
       setSelectedList(undefined);
+      toast.success("List deleted!");
     } catch (error) {
       console.error(error);
+      toast.error("Couldn't delete the list.");
     }
   }
 
