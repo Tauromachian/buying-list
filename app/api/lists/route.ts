@@ -6,7 +6,10 @@ import { CreateListDTO } from "@/lib/dto/list";
 
 export async function GET() {
   try {
-    const lists = await db.select().from(listsTable);
+    const lists = await db
+      .select()
+      .from(listsTable)
+      .orderBy(listsTable.createdAt);
 
     return Response.json({ data: lists });
   } catch (error) {
