@@ -39,7 +39,7 @@ export function Dialog({
       closedby="any"
       onClose={close}
       aria-labelledby={title ? titleId : undefined}
-      className="m-auto rounded-md backdrop:bg-black backdrop:opacity-30 min-w-80"
+      className="m-auto rounded-md min-w-80"
     >
       <Button
         onClick={close}
