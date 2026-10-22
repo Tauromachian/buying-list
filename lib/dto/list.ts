@@ -2,6 +2,8 @@ import * as z from "zod";
 
 export const ListDTO = z.object({
   id: z.number().positive(),
+  userId: z.number().positive(),
+  groupId: z.number().positive().optional(),
   name: z.string().nonempty(),
   createdAt: z.string().nonempty(),
   description: z.string().optional(),
