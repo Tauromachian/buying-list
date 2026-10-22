@@ -2,10 +2,13 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
+import { classesMerge } from "@/utils/component-classes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,9 +48,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <li className="w-full text-center" key={link.link}>
                 <Link
                   href={link.link}
-                  className={
-                    pathname === link.link ? "bg-neutral-2 text-text-1" : ""
-                  }
+                  className={classesMerge(
+                    "block py-1 w-full rounded-lg",
+                    pathname === link.link ? "bg-neutral-2 text-text-1" : "",
+                  )}
                 >
                   {link.text}
                 </Link>
