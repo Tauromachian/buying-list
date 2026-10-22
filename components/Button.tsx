@@ -1,11 +1,11 @@
 import { cva } from "class-variance-authority";
 
-import { BaseComponent } from "@/types/Component";
 import { classesMerge } from "@/utils/component-classes";
+import { ComponentProps } from "react";
 
 type Variant = "default" | "outlined";
 
-type ButtonProps = BaseComponent & {
+type ButtonProps = ComponentProps<"button"> & {
   children: React.ReactNode;
   variant?: Variant;
   onClick?: () => void;
@@ -39,12 +39,14 @@ export function Button({
   label,
   variant = "default",
   icon,
+  ...rest
 }: ButtonProps) {
   return (
     <button
       onClick={onClick}
       aria-label={label}
       className={classesMerge(getClasses(variant, icon), className)}
+      {...rest}
     >
       {children}
     </button>
