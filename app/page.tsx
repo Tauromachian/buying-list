@@ -217,7 +217,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-140 mx-auto mt-20">
+    <div className="w-140 mx-auto">
       <h1 className="mb-5 text-xl">Lists</h1>
       <Button className="ml-auto" onClick={() => openDialog("add")}>
         Create List

@@ -65,8 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </ul>
         </nav>
 
-        {children}
-
+        <main className="mt-10">{children}</main>
         <ToastContainer position="bottom-right" />
       </body>
     </html>

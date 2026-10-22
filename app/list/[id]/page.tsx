@@ -232,7 +232,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-80 mx-auto mt-20">
+    <div className="w-80 mx-auto">
       <Card className="mb-5 bg-gray-200" variant="flat">
         <Breadcrumbs breadcrumbs={breadcrumbs}></Breadcrumbs>
       </Card>
