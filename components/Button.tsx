@@ -24,7 +24,7 @@ function getClasses(variant: Variant, icon?: boolean) {
         text: "rounded bg-transparent px-4 py-2",
       },
       icon: {
-        true: "rounded-full bg-transparent flex justify-center items-center outline-none",
+        true: "rounded-full bg-transparent flex justify-center items-center outline-none p-3",
       },
     },
     defaultVariants: { variant: "default", icon: false },
