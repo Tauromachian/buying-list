@@ -3,6 +3,7 @@ import {
   integer,
   pgTable,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -11,22 +12,37 @@ export const usersTable = pgTable("users", {
   name: varchar({ length: 100 }).notNull(),
 });
 
+export const groupsTable = pgTable("groups", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 150 }).notNull(),
+});
+
 export const listsTable = pgTable("lists", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => usersTable.id),
+  groupId: integer("group_id").references(() => groupsTable.id),
   name: varchar({ length: 100 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   description: varchar({ length: 200 }),
 });
 
-export const usersListsTable = pgTable("users_lists", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("user_id")
-    .notNull()
-    .references(() => usersTable.id),
-  listId: integer("list_id")
-    .notNull()
-    .references(() => listsTable.id),
-});
+export const usersGroupsTable = pgTable(
+  "users_groups",
+  {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id),
+    groupId: integer("group_id")
+      .notNull()
+      .references(() => groupsTable.id),
+  },
+  (table) => [
+    unique("users_groups_user_group_unique").on(table.userId, table.groupId),
+  ],
+);
 
 export const itemsTable = pgTable("items", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
