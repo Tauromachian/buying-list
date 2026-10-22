@@ -36,7 +36,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-neutral-0 text-text-0">
+      <body className="min-h-full max-w-6xl my-auto flex flex-col bg-neutral-0 text-text-0 ">
+        <p>Buying List</p>
+
         <nav className="bg-neutral-1 rounded-xl p-1 hidden lg:block">
           <ul className="font-medium text-sm flex justify-evenly gap-5">
             {links.map((link) => (
