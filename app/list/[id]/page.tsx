@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -9,9 +10,12 @@ import { Checkbox } from "@/components/Checkbox";
 import { EmptyState } from "@/components/EmptyState";
 import { Dialog } from "@/components/Dialog";
 import { InputText } from "@/components/InputText";
+import { Loader } from "@/components/Loader";
+import { Menu } from "@/components/Menu";
+
 import { createItem, getItems } from "@/lib/api/items";
 import type { CreateItem, Item } from "@/lib/dto/item";
-import { Loader } from "@/components/Loader";
+import { Icon } from "@/components/Icon";
 
 type ItemForm = Pick<CreateItem, "name" | "quantity">;
 
@@ -29,18 +33,32 @@ function ItemRow({
   const itemId = String(item.id);
 
   return (
-    <Checkbox
-      id={itemId}
-      value={itemId}
-      state={activeItems}
-      setState={setActiveItems}
-      hasStrikeThrough
-    >
-      <span className="flex justify-between ml-2 w-full">
-        <p>{item.name}</p>
-        <p className="font-bold">#{item.quantity}</p>
-      </span>
-    </Checkbox>
+    <div className="flex items-center">
+      <Checkbox
+        id={itemId}
+        value={itemId}
+        state={activeItems}
+        setState={setActiveItems}
+        hasStrikeThrough
+      >
+        <span className="flex justify-between ml-2 w-full">
+          <p>{item.name}</p>
+        </span>
+      </Checkbox>
+
+      <p className="font-bold ml-auto mr-3">#{item.quantity}</p>
+
+      <Menu
+        activator={(popoverTarget) => (
+          <Button variant="outlined" icon popoverTarget={popoverTarget}>
+            <Icon icon="mdi:dots-vertical"></Icon>
+          </Button>
+        )}
+      >
+        <Button variant="text">Edit</Button>
+        <Button variant="text">Delete</Button>
+      </Menu>
+    </div>
   );
 }
 
