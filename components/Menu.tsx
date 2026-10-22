@@ -16,16 +16,30 @@ type Position =
 
 type Props = {
   position?: Position;
-  activator: (popoverTarget: string) => React.ReactNode;
+  activator: React.ReactElement;
   children: React.ReactNode;
+  className?: string;
+  open?: boolean;
+  onToggle?: (event: React.ToggleEvent) => void;
 };
 
 export function Menu({
   position = "bottom center",
   activator,
   children,
+  className,
+  open,
+  onToggle,
 }: Props) {
   const id = useId();
+
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  if (open) {
+    popoverRef.current?.showPopover();
+  } else {
+    popoverRef.current?.hidePopover();
+  }
 
   return (
     <>
