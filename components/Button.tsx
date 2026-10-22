@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import { classesMerge } from "@/utils/component-classes";
 import { ComponentProps } from "react";
 
-type Variant = "default" | "outlined";
+type Variant = "default" | "outlined" | "text";
 
 type ButtonProps = ComponentProps<"button"> & {
   children: React.ReactNode;
@@ -21,6 +21,7 @@ function getClasses(variant: Variant, icon?: boolean) {
       variant: {
         default: "rounded bg-accent-0 px-4 py-2",
         outlined: "rounded bg-transparent border-2 border-gray-0 px-4 py-2",
+        text: "rounded bg-transparent px-4 py-2",
       },
       icon: {
         true: "rounded-full bg-transparent flex justify-center items-center outline-none",
