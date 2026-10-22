@@ -40,7 +40,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full max-w-6xl mx-auto flex flex-col bg-neutral-0 text-text-0 ">
-        <p>Buying List</p>
+        <header className="pt-5">
+          <h1 className="font-serif text-4xl font-bold text-text-1">
+            Buying
+            <span className="text-accent-0 italic"> Finances </span>
+          </h1>
+        </header>
 
         <nav className="bg-neutral-1 rounded-xl p-1 hidden lg:block">
           <ul className="font-medium text-sm flex justify-evenly gap-5">
