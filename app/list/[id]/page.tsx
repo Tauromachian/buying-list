@@ -13,22 +13,35 @@ import { InputText } from "@/components/InputText";
 import { Loader } from "@/components/Loader";
 import { Menu } from "@/components/Menu";
 
-import { createItem, getItems } from "@/lib/api/items";
+import { createItem, getItems, deleteItem, updateItem } from "@/lib/api/items";
 import type { CreateItem, Item } from "@/lib/dto/item";
 import { Icon } from "@/components/Icon";
+import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 
-type ItemForm = Pick<CreateItem, "name" | "quantity">;
+function assertItem(item?: Item, msg?: string): asserts item is Item {
+  msg ??= "This object should be of type Item.";
 
-const EMPTY_FORM: ItemForm = { name: "", quantity: 1 };
+  if (!item) throw new Error(msg);
+
+  if (!item.id || !item.name) throw new Error(msg);
+}
+
+type ItemForm = Pick<CreateItem, "name" | "quantity" | "listId">;
+
+const EMPTY_FORM: ItemForm = { name: "", quantity: 1, listId: 0 };
 
 function ItemRow({
   item,
   activeItems,
   setActiveItems,
+  onClickEdit,
+  onClickDelete,
 }: {
   item: Item;
   activeItems: string[];
   setActiveItems: (ids: string[]) => void;
+  onClickEdit: () => void;
+  onClickDelete: () => void;
 }) {
   const itemId = String(item.id);
 
@@ -55,8 +68,12 @@ function ItemRow({
           </Button>
         )}
       >
-        <Button variant="text">Edit</Button>
-        <Button variant="text">Delete</Button>
+        <Button variant="text" onClick={onClickEdit}>
+          Edit
+        </Button>
+        <Button variant="text" onClick={onClickDelete}>
+          Delete
+        </Button>
       </Menu>
     </div>
   );
@@ -76,8 +93,12 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
+    useState<boolean>();
 
   const [activeItems, setActiveItems] = useState<string[]>([]);
+
+  const [selectedItem, setSelectedItem] = useState<Item>();
 
   const loadData = async function (currentListId: number) {
     setIsLoading(true);
@@ -103,29 +124,79 @@ export default function Home() {
     },
   ];
 
-  async function addItem(event: React.SubmitEvent) {
+  function submit(event: React.SubmitEvent) {
     event.preventDefault();
 
-    const data: CreateItem = {
-      ...form,
-      listId: Number(listId),
-      checked: false,
-    };
+    if (!selectedItem) {
+      addItem({ ...form, checked: false, listId: Number(listId) });
+    } else {
+      editItem(form);
+    }
+  }
 
+  async function addItem(data: CreateItem) {
     try {
-      const item = await createItem(data);
+      const inserted = await createItem(data);
 
-      setItems((prev) => [...prev, item]);
+      setItems((prev) => [...prev, inserted]);
       setIsDialogOpen(false);
-      setForm(EMPTY_FORM);
+      setForm({ ...EMPTY_FORM, listId: Number(listId) });
     } catch (error) {
       console.error(error);
     }
   }
 
-  function openAddItemDialog() {
-    setForm(EMPTY_FORM);
+  async function editItem(formData: Partial<Item>) {
+    assertItem(selectedItem);
+
+    try {
+      await updateItem(selectedItem.id, formData);
+
+      setIsDialogOpen(false);
+      setForm(EMPTY_FORM);
+      setSelectedItem(undefined);
+      await loadData(Number(listId));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function openFormDialog(type: "add" | "edit", item?: Item) {
+    if (type === "edit") {
+      if (!item) {
+        throw new Error("Open dialog in edit mode should always have a item");
+      }
+
+      setSelectedItem(item);
+
+      setForm({
+        name: item.name,
+        quantity: item.quantity,
+        listId: Number(listId),
+      });
+    } else {
+      setForm(EMPTY_FORM);
+    }
+
     setIsDialogOpen(true);
+  }
+
+  function openDeleteConfirmationDialog(item: Item) {
+    setSelectedItem(item);
+    setIsDeleteConfirmationDialogOpen(true);
+  }
+
+  async function removeItem() {
+    assertItem(selectedItem);
+
+    try {
+      await deleteItem(selectedItem.id);
+      await loadData(Number(listId));
+      setIsDeleteConfirmationDialogOpen(false);
+      setSelectedItem(undefined);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   let content: React.ReactNode;
@@ -147,6 +218,8 @@ export default function Home() {
         item={item}
         activeItems={activeItems}
         setActiveItems={setActiveItems}
+        onClickEdit={() => openFormDialog("edit", item)}
+        onClickDelete={() => openDeleteConfirmationDialog(item)}
       />
     ));
   }
@@ -159,7 +232,7 @@ export default function Home() {
 
       <h1 className="mb-5 text-xl">List</h1>
 
-      <Button className="ml-auto" onClick={openAddItemDialog}>
+      <Button className="ml-auto" onClick={() => openFormDialog("add")}>
         Add Item
       </Button>
 
@@ -167,7 +240,7 @@ export default function Home() {
         <Card>
           <p className="text-md font-bold mb-4">Add new item to list</p>
 
-          <form onSubmit={addItem} className="flex flex-col gap-3">
+          <form onSubmit={submit} className="flex flex-col gap-3">
             <InputText
               label="Name"
               state={form.name}
@@ -192,6 +265,12 @@ export default function Home() {
       </Dialog>
 
       <Card className="mt-7 flex flex-col gap-4">{content}</Card>
+
+      <DeleteConfirmationDialog
+        open={isDeleteConfirmationDialogOpen}
+        onClose={() => setIsDeleteConfirmationDialogOpen(false)}
+        onDelete={() => removeItem()}
+      ></DeleteConfirmationDialog>
     </div>
   );
 }
