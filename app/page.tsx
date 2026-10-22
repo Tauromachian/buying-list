@@ -199,6 +199,7 @@ export default function Home() {
         <InputText
           setState={(search) => setSearch(search as string)}
           placeholder="Search"
+          appendIcon="mdi:search"
         ></InputText>
 
         <ul className="flex flex-col gap-4 mt-5">
