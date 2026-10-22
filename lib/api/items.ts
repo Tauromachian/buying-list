@@ -7,7 +7,7 @@
  * This module is browser-bound (relative-URL fetches). Import types only
  * from `lib/dto` so the zod schemas never reach the client bundle.
  */
-import type { CreateItem, Item } from "@/lib/dto/item";
+import type { CreateItem, Item, UpdateItem } from "@/lib/dto/item";
 import { handleResponseError } from "./_utils";
 
 /** GET /api/items?listId=… (optional filters) — `{ data: … }` envelope. */
@@ -42,4 +42,20 @@ export async function createItem(data: CreateItem): Promise<Item> {
 
   const { data: inserted } = (await res.json()) as { data: Item };
   return inserted;
+}
+
+/** PATCH /api/items/[id] */
+export async function updateItem(id: number, data: UpdateItem): Promise<void> {
+  const res = await fetch(`/api/items/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  });
+  handleResponseError(res);
+}
+
+/** DELETE /api/items/[id] */
+export async function deleteItem(id: number): Promise<void> {
+  const res = await fetch(`/api/items/${id}`, { method: "DELETE" });
+  handleResponseError(res);
 }
