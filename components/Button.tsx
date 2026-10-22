@@ -16,7 +16,7 @@ type ButtonProps = ComponentProps<"button"> & {
 function getClasses(variant: Variant, icon?: boolean) {
   // Last classes win in `classesMerge`, so `icon` overrides fills from the
   // chosen variant.
-  const buttonVariants = cva("cursor-pointer", {
+  const buttonVariants = cva("cursor-pointer text-text-1", {
     variants: {
       variant: {
         default: "rounded bg-accent-0 px-4 py-2",
