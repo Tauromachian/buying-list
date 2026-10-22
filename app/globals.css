@@ -6,14 +6,19 @@
   --color-danger-0: #e7000b;
   --color-danger-1: #c10007;
 
-  --color-text-0: #0f1623;
-  --color-text-1: #5a6478;
+  --color-text-0: #5a6478;
+  --color-text-1: #0f1623;
+  --color-text-inverse: white;
 
-  --color-neutral-0: #fef8fc;
+  --color-neutral-0: #eef1f7;
+  --color-neutral-1: #d4dae8;
+  --color-neutral-2: #f8f9fc;
 
-  --color-gray-0: #697381;
-
-  --color-accent-0: #ff9a00;
+  --color-accent-0: #2563eb;
+  --color-accent-1: #2050bb;
+  --color-accent-2: #5a6478;
+  --color-accent-3: #0f1623;
+  --color-accent-4: #0ea5e9;
 
   --font-serif: "DM Serif Display", sans-serif;
   --font-sans: "DM Sans Variable", sans-serif;
@@ -25,12 +30,17 @@
 
   --color-text-0: #6b7a96;
   --color-text-1: #e4eaf5;
+  --color-text-inverse: black;
 
   --color-neutral-0: #0d1117;
   --color-neutral-1: #1e2736;
   --color-neutral-2: #161c27;
 
   --color-accent-0: #3b82f6;
+  --color-accent-1: #1b5be8;
+  --color-accent-2: #5a6478;
+  --color-accent-3: #e4eaf5;
+  --color-accent-4: #3b82f6;
 }
 
 @media (prefers-reduced-motion: no-preference) {
