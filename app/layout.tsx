@@ -14,6 +14,7 @@ import { useThemeStore } from "@/stores/theme";
 
 import { Switch } from "@/components/Switch";
 import { ThemeName } from "@/types/theme";
+import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,14 @@ const geistMono = Geist_Mono({
 });
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const themeName = useThemeStore((state) => state.theme);
+  const initTheme = useThemeStore((state) => state.initTheme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+
+  useEffect(() => {
+    initTheme();
+  }, []);
+
   const links = [
     {
       text: "Lists",
@@ -36,9 +45,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       link: "/groups",
     },
   ];
-
-  const themeName = useThemeStore((state) => state.theme);
-  const setTheme = useThemeStore((state) => state.setTheme);
 
   const pathname = usePathname();
 
