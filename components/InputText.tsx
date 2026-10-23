@@ -26,7 +26,7 @@ export function InputText<
   }
 
   return (
-    <div className="flex flex-col">
+    <div>
       {label && <label htmlFor={inputId}>{label}</label>}{" "}
       <div className="relative">
         <input

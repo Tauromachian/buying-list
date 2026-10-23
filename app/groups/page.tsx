@@ -179,14 +179,14 @@ export default function Groups() {
         </p>
 
         <div className="flex gap-2 mt-4">
-          <InputText
-            state={newGroupName}
-            setState={setNewGroupName}
-            name="groupName"
-            placeholder="New group name"
-            className="flex-1"
-            onKeyDown={(event) => event.key === "Enter" && addGroup()}
-          />
+          <div className="flex-1">
+            <InputText
+              state={newGroupName}
+              setState={setNewGroupName}
+              placeholder="New group name"
+              onKeyDown={(event) => event.key === "Enter" && addGroup()}
+            />
+          </div>
 
           <Button onClick={() => addGroup()}>Create</Button>
         </div>
