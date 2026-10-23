@@ -10,7 +10,7 @@ export function Card({ variant = "default", children, className }: CardProps) {
   return (
     <div
       className={classesMerge(
-        "p-5 rounded-2xl",
+        "p-5 rounded-2xl bg-neutral-2",
         className,
         variant === "default" && "shadow shadow-gray-400",
       )}
