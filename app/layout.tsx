@@ -10,6 +10,11 @@ import "./globals.css";
 
 import { classesMerge } from "@/utils/component-classes";
 
+import { useThemeStore } from "@/stores/theme";
+
+import { Switch } from "@/components/Switch";
+import { ThemeName } from "@/types/theme";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,6 +37,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     },
   ];
 
+  const themeName = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+
   const pathname = usePathname();
 
   return (
@@ -40,10 +48,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full max-w-6xl mx-auto flex flex-col bg-neutral-0 text-text-0 ">
-        <header className="pt-5">
+        <header className="pt-5 flex justify-between">
           <h1 className="font-serif text-4xl font-bold text-text-1">
             Buying List
           </h1>
+
+          <Switch
+            setState={(theme: string | number) => setTheme(theme as ThemeName)}
+            state={themeName}
+            stepsValues={{ start: "light", middle: "system", end: "dark" }}
+            label={themeName}
+          ></Switch>
         </header>
 
         <nav className="bg-neutral-1 rounded-xl p-1 hidden lg:block">
