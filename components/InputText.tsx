@@ -12,7 +12,14 @@ type InputTextProps<T> = Partial<InputHTMLAttributes<HTMLInputElement>> & {
 
 export function InputText<
   T extends string | number | readonly string[] | undefined,
->({ state, setState, label, appendIcon, id, ...nativeProps }: InputTextProps<T>) {
+>({
+  state,
+  setState,
+  label,
+  appendIcon,
+  id,
+  ...nativeProps
+}: InputTextProps<T>) {
   // Hooks run unconditionally; the prop, when provided, wins.
   const autoId = useId();
   const inputId = id ?? autoId;
@@ -35,7 +42,7 @@ export function InputText<
           onChange={onChange}
           value={state}
           className={classesMerge(
-            "border border-gray-0 rounded p-1 w-full",
+            "@apply w-full text-text-1 border bg-neutral-0 border-neutral-1 px-3 py-2 rounded-xl focus:outline-none focus:border-accent-0",
             appendIcon && "pr-8",
           )}
           {...nativeProps}
