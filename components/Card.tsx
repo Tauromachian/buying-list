@@ -12,7 +12,7 @@ export function Card({ variant = "default", children, className }: CardProps) {
       className={classesMerge(
         "p-5 rounded-2xl bg-neutral-2",
         className,
-        variant === "default" && "shadow shadow-gray-400",
+        variant === "default" && "shadow-sm",
       )}
     >
       {children}
