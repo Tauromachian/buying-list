@@ -42,8 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full max-w-6xl mx-auto flex flex-col bg-neutral-0 text-text-0 ">
         <header className="pt-5">
           <h1 className="font-serif text-4xl font-bold text-text-1">
-            Buying
-            <span className="text-accent-0 italic"> Finances </span>
+            Buying List
           </h1>
         </header>
 
