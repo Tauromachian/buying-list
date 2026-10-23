@@ -19,8 +19,8 @@ function getClasses(variant: Variant, icon?: boolean) {
   const buttonVariants = cva("cursor-pointer text-text-1", {
     variants: {
       variant: {
-        default: "rounded bg-accent-0 px-4 py-2",
-        outlined: "rounded bg-transparent border-2 border-gray-0 px-4 py-2",
+        default: "rounded-xl text-white bg-accent-0 px-4 py-2",
+        outlined: "rounded-xl bg-transparent border-2 border-gray-0 px-4 py-2",
         text: "rounded bg-transparent px-4 py-2",
       },
       icon: {
