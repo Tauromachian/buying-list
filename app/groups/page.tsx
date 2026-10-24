@@ -199,16 +199,16 @@ export default function Groups() {
           <p className="text-md font-bold">{selectedGroup.name} members</p>
 
           <div className="flex gap-2 mt-4">
-            <InputText
-              state={newMemberEmail}
-              setState={setNewMemberEmail}
-              name="memberEmail"
-              type="email"
-              placeholder="Member email"
-              className="flex-1"
-              autoComplete="off"
-              onKeyDown={(event) => event.key === "Enter" && addMember()}
-            />
+            <div className="flex-1">
+              <InputText
+                state={newMemberEmail}
+                setState={setNewMemberEmail}
+                name="memberEmail"
+                type="email"
+                placeholder="Member email"
+                onKeyDown={(event) => event.key === "Enter" && addMember()}
+              />
+            </div>
             <Button onClick={() => addMember()}>Add</Button>
           </div>
 
