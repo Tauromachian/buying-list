@@ -10,7 +10,13 @@ import { Dialog } from "@/components/Dialog";
 import { EmptyState } from "@/components/EmptyState";
 import { InputText } from "@/components/InputText";
 
-import { createList, deleteList, getLists, updateList } from "@/lib/api/lists";
+import {
+  createList,
+  deleteList,
+  getLists,
+  updateList,
+  cloneList,
+} from "@/lib/api/lists";
 import type { CreateList, List } from "@/lib/dto/list";
 import { Loader } from "@/components/Loader";
 import { toast } from "react-toastify";
@@ -29,10 +35,12 @@ function ListRow({
   list,
   onEdit,
   onDelete,
+  onClone,
 }: {
   list: List;
   onEdit: (list: List) => void;
   onDelete: (list: List) => void;
+  onClone: (list: List) => void;
 }) {
   return (
     <li className="flex justify-between items-center">
@@ -44,6 +52,7 @@ function ListRow({
         >
           Go to list
         </Link>
+        <Button onClick={() => onClone(list)}>Clone</Button>
         <Button onClick={() => onEdit(list)}>Edit</Button>
         <Button onClick={() => onDelete(list)}>Delete</Button>
       </div>
@@ -152,6 +161,17 @@ export default function Home() {
     }
   }
 
+  async function clone(list: List) {
+    try {
+      const { message } = await cloneList(list.id);
+      loadData();
+      toast.success(message);
+    } catch (error) {
+      console.error(error);
+      toast.error("Couldn't clone list");
+    }
+  }
+
   function openDialog(type: "add" | "edit", list?: List) {
     if (type === "edit") {
       if (!list) {
@@ -207,6 +227,7 @@ export default function Home() {
             <ListRow
               key={list.id}
               list={list}
+              onClone={clone}
               onEdit={(list) => openDialog("edit", list)}
               onDelete={openDeleteConfirmationDialog}
             />
