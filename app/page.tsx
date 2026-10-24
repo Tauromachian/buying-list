@@ -40,7 +40,7 @@ function ListRow({
       <div className="flex gap-2 ml-auto items-center">
         <Link
           href={`/list/${list.id}`}
-          className="text-blue-400 underline ml-auto mr-4"
+          className="text-blue-400 underline ml-auto mr-2"
         >
           Go to list
         </Link>
