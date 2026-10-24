@@ -37,7 +37,7 @@ function ListRow({
   return (
     <li className="flex justify-between items-center">
       <p>{list.name}</p>
-      <div className="flex gap-4 ml-auto items-center">
+      <div className="flex gap-2 ml-auto items-center">
         <Link
           href={`/list/${list.id}`}
           className="text-blue-400 underline ml-auto mr-4"
