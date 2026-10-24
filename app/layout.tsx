@@ -1,6 +1,6 @@
 "use client";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -16,13 +16,14 @@ import { Switch } from "@/components/Switch";
 import { ThemeName } from "@/types/theme";
 import { useEffect } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
+  variable: "--dm-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSerifDisplay = DM_Serif_Display({
+  weight: "400",
+  variable: "--dm-serif-display",
   subsets: ["latin"],
 });
 
@@ -51,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${dmSerifDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full max-w-6xl mx-auto flex flex-col bg-neutral-0 text-text-0 ">
         <header className="pt-5 flex justify-between">
