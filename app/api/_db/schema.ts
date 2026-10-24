@@ -34,10 +34,10 @@ export const usersGroupsTable = pgTable(
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("user_id")
       .notNull()
-      .references(() => usersTable.id),
+      .references(() => usersTable.id, { onDelete: "cascade" }),
     groupId: integer("group_id")
       .notNull()
-      .references(() => groupsTable.id),
+      .references(() => groupsTable.id, { onDelete: "cascade" }),
   },
   (table) => [
     unique("users_groups_user_group_unique").on(table.userId, table.groupId),
