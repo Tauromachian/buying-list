@@ -48,3 +48,12 @@ export async function deleteList(id: number): Promise<void> {
   const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
   handleResponseError(res);
 }
+
+export async function cloneList(id: number): Promise<{ message: string }> {
+  const res = await fetch(`/api/lists/${id}/clone`, { method: "POST" });
+  handleResponseError(res);
+
+  const data = await res.json();
+
+  return data;
+}
