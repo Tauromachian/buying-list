@@ -233,7 +233,7 @@ export default function Groups() {
               ))}
             </div>
           ) : (
-            <EmptyState></EmptyState>
+            <EmptyState className="mt-10"></EmptyState>
           )}
 
           <div className="w-full flex gap-2">
