@@ -14,6 +14,15 @@ export const usersTable = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const sessionsTable = pgTable("users", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  refreshToken: varchar("refresh_token", { length: 240 }).notNull().unique(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const groupsTable = pgTable("groups", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 150 }).notNull(),
