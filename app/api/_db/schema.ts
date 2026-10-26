@@ -14,7 +14,7 @@ export const usersTable = pgTable("users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const sessionsTable = pgTable("users", {
+export const sessionsTable = pgTable("sessions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer("user_id")
     .notNull()
