@@ -1,8 +1,8 @@
-import { InputHTMLAttributes, useId } from "react";
+import { ComponentProps, useId } from "react";
 import { classesMerge } from "@/utils/component-classes";
 import { Icon } from "./Icon";
 
-type InputTextProps<T> = Partial<InputHTMLAttributes<HTMLInputElement>> & {
+type InputTextProps<T> = ComponentProps<"input"> & {
   state?: T;
   setState?: (value: T) => void;
   label?: string;
