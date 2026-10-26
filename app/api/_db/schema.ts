@@ -9,7 +9,9 @@ import {
 
 export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 100 }).notNull(),
+  email: varchar({ length: 240 }).notNull().unique(),
+  password: varchar({ length: 240 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const groupsTable = pgTable("groups", {
