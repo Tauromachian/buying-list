@@ -2,7 +2,7 @@ import * as z from "zod";
 
 export const UserDTO = z.object({
   id: z.number().positive(),
-  name: z.string().nonempty(),
+  email: z.string().nonempty(),
   password: z.string().nonempty(),
 });
 
