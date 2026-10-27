@@ -10,7 +10,7 @@ const UNIT_MS: Record<string, number> = {
 
 /**
  * Parses a duration string in the `jsonwebtoken` `expiresIn` dialect
- * ("15m", "7d", …) into milliseconds.
+ * ("15m", "7d", …) into seconds.
  *
  * Throws on anything else — a malformed lifetime must crash at boot,
  * never silently mint mismatched expiries.
@@ -20,5 +20,5 @@ export function parseExpiresIn(expiresIn: string): number {
 
   if (!match) throw new Error(`Invalid expiresIn: "${expiresIn}"`);
 
-  return Number(match[1]) * UNIT_MS[match[2]];
+  return Math.floor((Number(match[1]) * UNIT_MS[match[2]]) / 1000);
 }

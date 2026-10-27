@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: Math.floor(EXPIRES_IN_SECONDS),
+      maxAge: EXPIRES_IN_SECONDS,
     });
 
     await db
@@ -81,6 +81,6 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("[POST /api/auth/login]", error);
-    return Response.json({ message: " DB Error" }, { status: 500 });
+    return Response.json({ message: "DB Error" }, { status: 500 });
   }
 }

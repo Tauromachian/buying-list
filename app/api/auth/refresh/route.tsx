@@ -72,7 +72,7 @@ export async function POST() {
       httpOnly: true,
       secure: NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: Math.floor(EXPIRES_IN_SECONDS),
+      maxAge: EXPIRES_IN_SECONDS,
     });
 
     return Response.json(
