@@ -80,10 +80,7 @@ export async function POST(req: Request) {
       { status: 200 },
     );
   } catch (error) {
-    console.error(error);
-    return Response.json(
-      { message: "[POST /api/auth/login] DB Error" },
-      { status: 500 },
-    );
+    console.error("[POST /api/auth/login]", error);
+    return Response.json({ message: " DB Error" }, { status: 500 });
   }
 }
