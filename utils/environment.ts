@@ -1,8 +1,8 @@
 export function assertEnvVar(
+  name: string,
   envVar?: string,
-  name?: string,
 ): asserts envVar is string {
   if (!envVar) {
-    throw new Error(`Environment variable is required ${name && ":" + name}`);
+    throw new Error(`Environment variable ${name} is required`);
   }
 }
