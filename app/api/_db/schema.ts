@@ -20,7 +20,7 @@ export const sessionsTable = pgTable("sessions", {
   userId: integer("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
-  refreshToken: text().notNull().unique(),
+  token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
