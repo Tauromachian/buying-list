@@ -33,6 +33,8 @@ assertEnvVar(JWT_ACCESS_EXPIRES_IN, "JWT_ACCESS_EXPIRES_IN");
 assertEnvVar(JWT_REFRESH_SECRET, "JWT_REFRESH_SECRET");
 assertEnvVar(JWT_REFRESH_EXPIRES_IN, "JWT_REFRESH_EXPIRES_IN");
 
+const EXPIRES_IN_SECONDS = parseExpiresIn(JWT_REFRESH_EXPIRES_IN) / 1000;
+
 function makeToken(
   payload: Record<string, string>,
   secret: string,
@@ -103,7 +105,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: NODE_ENV === "production",
       sameSite: "lax",
-      expires: parseExpiresIn(JWT_REFRESH_EXPIRES_IN!),
+      maxAge: EXPIRES_IN_SECONDS,
     });
 
     await db
