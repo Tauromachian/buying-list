@@ -2,8 +2,6 @@ import { flattenError } from "zod";
 import { verify } from "@node-rs/argon2";
 import { cookies } from "next/headers";
 
-import jwt from "jsonwebtoken";
-
 import { db } from "@/app/api/_db";
 
 import { sessionsTable, usersTable } from "@/app/api/_db/schema";
@@ -12,41 +10,13 @@ import { eq } from "drizzle-orm";
 
 import { parseExpiresIn } from "@/utils/expires-in";
 import { assertEnvVar } from "@/utils/environment";
+import { makeAccessToken, makeRefreshToken } from "@/utils/jwt";
 
-const {
-  JWT_ACCESS_SECRET,
-  JWT_ACCESS_EXPIRES_IN,
-  JWT_REFRESH_SECRET,
-  JWT_REFRESH_EXPIRES_IN,
-  NODE_ENV,
-} = process.env;
+const { JWT_REFRESH_EXPIRES_IN, NODE_ENV } = process.env;
 
-assertEnvVar("JWT_ACCESS_SECRET", JWT_ACCESS_SECRET);
-assertEnvVar("JWT_ACCESS_EXPIRES_IN", JWT_ACCESS_EXPIRES_IN);
-assertEnvVar("JWT_REFRESH_SECRET", JWT_REFRESH_SECRET);
 assertEnvVar("JWT_REFRESH_EXPIRES_IN", JWT_REFRESH_EXPIRES_IN);
 
 const EXPIRES_IN_SECONDS = parseExpiresIn(JWT_REFRESH_EXPIRES_IN) / 1000;
-
-function makeToken(
-  payload: Record<string, string>,
-  secret: string,
-  expiresIn: string,
-) {
-  const token = jwt.sign(payload, secret, {
-    expiresIn: expiresIn,
-  });
-
-  return token;
-}
-
-function makeAccessToken(payload: Record<string, string>) {
-  return makeToken(payload, JWT_ACCESS_SECRET!, JWT_ACCESS_EXPIRES_IN!);
-}
-
-function makeRefreshToken() {
-  return makeToken({}, JWT_REFRESH_SECRET!, JWT_REFRESH_EXPIRES_IN!);
-}
 
 export async function POST(req: Request) {
   try {
