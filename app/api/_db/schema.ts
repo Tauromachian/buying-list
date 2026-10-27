@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   pgTable,
+  text,
   timestamp,
   unique,
   varchar,
@@ -19,7 +20,7 @@ export const sessionsTable = pgTable("sessions", {
   userId: integer("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
-  refreshToken: varchar("refresh_token", { length: 240 }).notNull().unique(),
+  refreshToken: text().notNull().unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
