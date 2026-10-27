@@ -1,16 +1,73 @@
 import { flattenError } from "zod";
-import { hash } from "@node-rs/argon2";
+import { verify } from "@node-rs/argon2";
+import { cookies } from "next/headers";
+
+import jwt from "jsonwebtoken";
 
 import { db } from "@/app/api/_db";
 
-import { usersTable } from "@/app/api/_db/schema";
-import { CreateUserDTO } from "@/lib/dto/user";
+import { sessionsTable, usersTable } from "@/app/api/_db/schema";
+import { LoginDTO } from "@/lib/dto/auth";
 import { eq } from "drizzle-orm";
+import { parseExpiresIn } from "@/utils/expires-in";
+
+function assertEnvVar(
+  envVar?: string,
+  name?: string,
+): asserts envVar is string {
+  if (!envVar) {
+    throw new Error(`Environment variable is required ${name && ":" + name}`);
+  }
+}
+
+const {
+  JWT_ACCESS_SECRET,
+  JWT_ACCESS_EXPIRES_IN,
+  JWT_REFRESH_SECRET,
+  JWT_REFRESH_EXPIRES_IN,
+  NODE_ENV,
+} = process.env;
+
+assertEnvVar(JWT_ACCESS_SECRET, "JWT_ACCESS_SECRET");
+assertEnvVar(JWT_ACCESS_EXPIRES_IN, "JWT_ACCESS_EXPIRES_IN");
+assertEnvVar(JWT_REFRESH_SECRET, "JWT_REFRESH_SECRET");
+assertEnvVar(JWT_REFRESH_EXPIRES_IN, "JWT_REFRESH_EXPIRES_IN");
+
+function makeToken(
+  payload: Record<string, string>,
+  secret: string,
+  expiresIn: string,
+) {
+  const token = jwt.sign(payload, secret, {
+    expiresIn: expiresIn,
+  });
+
+  return token;
+}
+
+function makeAccessToken(payload: Record<string, string>) {
+  return makeToken(payload, JWT_ACCESS_SECRET!, JWT_ACCESS_EXPIRES_IN!);
+}
+
+function makeRefreshToken() {
+  return makeToken({}, JWT_REFRESH_SECRET!, JWT_REFRESH_EXPIRES_IN!);
+}
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    var body = await req.json();
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      {
+        message: "Data Invalid",
+        details: error instanceof Error ? error.message : "undefined",
+      },
+      { status: 400 },
+    );
+  }
 
-  const result = CreateUserDTO.safeParse(body);
+  const result = LoginDTO.safeParse(body);
 
   if (!result.success) {
     return Response.json(
@@ -20,7 +77,6 @@ export async function POST(req: Request) {
   }
 
   const user = result.data;
-  user.password = await hash(user.password);
 
   try {
     const [dbUser] = await db
@@ -28,18 +84,40 @@ export async function POST(req: Request) {
       .from(usersTable)
       .where(eq(usersTable.email, user.email));
 
-    if (!dbUser || user.password !== dbUser.password) {
+    if (!dbUser || !(await verify(dbUser.password, user.password))) {
       return Response.json(
         { message: "Invalid email or password" },
         { status: 401 },
       );
-    } else {
-      return Response.json({ message: "Successful login" }, { status: 200 });
     }
+
+    const accessToken = makeAccessToken({
+      id: String(dbUser.id),
+      email: dbUser.email,
+    });
+    const refreshToken = makeRefreshToken();
+
+    const cookiesStore = await cookies();
+
+    cookiesStore.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "lax",
+      expires: parseExpiresIn(JWT_REFRESH_EXPIRES_IN!),
+    });
+
+    await db
+      .insert(sessionsTable)
+      .values({ userId: dbUser.id, token: refreshToken });
+
+    return Response.json(
+      { message: "Successful login", data: accessToken },
+      { status: 200 },
+    );
   } catch (error) {
     console.error(error);
     return Response.json(
-      { message: "[POST /api/auth/login]" },
+      { message: "[POST /api/auth/login] DB Error" },
       { status: 500 },
     );
   }
