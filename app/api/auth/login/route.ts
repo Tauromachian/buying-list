@@ -9,16 +9,9 @@ import { db } from "@/app/api/_db";
 import { sessionsTable, usersTable } from "@/app/api/_db/schema";
 import { LoginDTO } from "@/lib/dto/auth";
 import { eq } from "drizzle-orm";
-import { parseExpiresIn } from "@/utils/expires-in";
 
-function assertEnvVar(
-  envVar?: string,
-  name?: string,
-): asserts envVar is string {
-  if (!envVar) {
-    throw new Error(`Environment variable is required ${name && ":" + name}`);
-  }
-}
+import { parseExpiresIn } from "@/utils/expires-in";
+import { assertEnvVar } from "@/utils/environment";
 
 const {
   JWT_ACCESS_SECRET,
