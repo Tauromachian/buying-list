@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: EXPIRES_IN_SECONDS,
+      maxAge: Math.floor(EXPIRES_IN_SECONDS),
     });
 
     await db
