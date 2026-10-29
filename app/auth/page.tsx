@@ -21,7 +21,7 @@ const EMPTY_FORM: User = {
 export default function Login() {
   const [form, setForm] = useState<User>({ ...EMPTY_FORM });
 
-  const setToken = useAuth((store) => store.setStoken);
+  const setToken = useAuth((store) => store.setToken);
 
   async function login(event: React.SubmitEvent) {
     event.preventDefault();
