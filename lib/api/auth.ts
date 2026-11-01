@@ -9,7 +9,7 @@ export async function loginApi(credentials: {
   const res = await fetch(endpoint, {
     method: "POST",
     body: JSON.stringify(credentials),
-    headers: { "Content-type": "application/json" },
+    headers: { "Content-Type": "application/json" },
   });
 
   handleResponseError(res);

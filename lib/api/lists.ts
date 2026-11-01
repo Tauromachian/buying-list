@@ -9,11 +9,11 @@
  */
 
 import type { CreateList, List, UpdateList } from "@/lib/dto/list";
-import { handleResponseError } from "./_utils";
+import { authFetch, handleResponseError } from "./_utils";
 
 /** GET /api/lists — responds with the `{ data: … }` envelope. */
 export async function getLists(): Promise<List[]> {
-  const res = await fetch("/api/lists");
+  const res = await authFetch("/api/lists");
   handleResponseError(res);
 
   const { data } = (await res.json()) as { data: List[] };
@@ -22,7 +22,7 @@ export async function getLists(): Promise<List[]> {
 
 /** POST /api/lists — expects the `{ data: … }` envelope. */
 export async function createList(data: CreateList): Promise<List> {
-  const res = await fetch("/api/lists", {
+  const res = await authFetch("/api/lists", {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -35,7 +35,7 @@ export async function createList(data: CreateList): Promise<List> {
 
 /** PATCH /api/lists/[id] */
 export async function updateList(id: number, data: UpdateList): Promise<void> {
-  const res = await fetch(`/api/lists/${id}`, {
+  const res = await authFetch(`/api/lists/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -45,12 +45,12 @@ export async function updateList(id: number, data: UpdateList): Promise<void> {
 
 /** DELETE /api/lists/[id] */
 export async function deleteList(id: number): Promise<void> {
-  const res = await fetch(`/api/lists/${id}`, { method: "DELETE" });
+  const res = await authFetch(`/api/lists/${id}`, { method: "DELETE" });
   handleResponseError(res);
 }
 
 export async function cloneList(id: number): Promise<{ message: string }> {
-  const res = await fetch(`/api/lists/${id}/clone`, { method: "POST" });
+  const res = await authFetch(`/api/lists/${id}/clone`, { method: "POST" });
   handleResponseError(res);
 
   const data = await res.json();

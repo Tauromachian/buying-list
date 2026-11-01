@@ -8,7 +8,7 @@
  * from `lib/dto` so the zod schemas never reach the client bundle.
  */
 import type { CreateItem, Item, UpdateItem } from "@/lib/dto/item";
-import { handleResponseError } from "./_utils";
+import { authFetch, handleResponseError } from "./_utils";
 
 /** GET /api/items?listId=… (optional filters) — `{ data: … }` envelope. */
 export async function getItems(filters?: {
@@ -24,7 +24,7 @@ export async function getItems(filters?: {
     endpoint += `?${params.toString()}`;
   }
 
-  const res = await fetch(endpoint);
+  const res = await authFetch(endpoint);
   handleResponseError(res);
 
   const { data } = (await res.json()) as { data: Item[] };
@@ -33,7 +33,7 @@ export async function getItems(filters?: {
 
 /** POST /api/items — expects the `{ data: … }` envelope. */
 export async function createItem(data: CreateItem): Promise<Item> {
-  const res = await fetch("/api/items", {
+  const res = await authFetch("/api/items", {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ export async function createItem(data: CreateItem): Promise<Item> {
 
 /** PATCH /api/items/[id] */
 export async function updateItem(id: number, data: UpdateItem): Promise<void> {
-  const res = await fetch(`/api/items/${id}`, {
+  const res = await authFetch(`/api/items/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -56,6 +56,6 @@ export async function updateItem(id: number, data: UpdateItem): Promise<void> {
 
 /** DELETE /api/items/[id] */
 export async function deleteItem(id: number): Promise<void> {
-  const res = await fetch(`/api/items/${id}`, { method: "DELETE" });
+  const res = await authFetch(`/api/items/${id}`, { method: "DELETE" });
   handleResponseError(res);
 }

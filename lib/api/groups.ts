@@ -9,11 +9,11 @@
  */
 
 import type { CreateGroup, Group, UpdateGroup } from "@/lib/dto/group";
-import { handleResponseError } from "./_utils";
+import { authFetch, handleResponseError } from "./_utils";
 
 /** GET /api/groups — responds with the `{ data: … }` envelope. */
 export async function getGroups(): Promise<Group[]> {
-  const res = await fetch("/api/groups");
+  const res = await authFetch("/api/groups");
   handleResponseError(res);
 
   const { data } = (await res.json()) as { data: Group[] };
@@ -22,7 +22,7 @@ export async function getGroups(): Promise<Group[]> {
 
 /** POST /api/groups — expects the `{ data: … }` envelope. */
 export async function createGroup(data: CreateGroup): Promise<Group> {
-  const res = await fetch("/api/groups", {
+  const res = await authFetch("/api/groups", {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -38,7 +38,7 @@ export async function updateGroup(
   id: number,
   data: UpdateGroup,
 ): Promise<void> {
-  const res = await fetch(`/api/groups/${id}`, {
+  const res = await authFetch(`/api/groups/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
@@ -48,6 +48,6 @@ export async function updateGroup(
 
 /** DELETE /api/groups/[id] */
 export async function deleteGroup(id: number): Promise<void> {
-  const res = await fetch(`/api/groups/${id}`, { method: "DELETE" });
+  const res = await authFetch(`/api/groups/${id}`, { method: "DELETE" });
   handleResponseError(res);
 }
