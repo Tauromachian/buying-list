@@ -4,8 +4,9 @@ import { ToastContainer } from "react-toastify";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
+import { Switch } from "@/components/Switch";
+
 import "react-toastify/dist/ReactToastify.css";
-import "./globals.css";
 
 import { classesMerge } from "@/utils/component-classes";
 
@@ -14,6 +15,8 @@ import { useThemeStore } from "@/stores/theme";
 import { useEffect } from "react";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const themeName = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
   const initTheme = useThemeStore((state) => state.initTheme);
 
   useEffect(() => {
@@ -23,18 +26,31 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   const links = [
     {
       text: "Lists",
-      link: "/",
+      link: "/app",
     },
     {
       text: "Groups",
-      link: "/groups",
+      link: "/app/groups",
     },
   ];
 
   const pathname = usePathname();
 
   return (
-    <div className="min-h-full max-w-6xl mx-auto flex flex-col bg-neutral-0 text-text-0 ">
+    <>
+      <header className="pt-5 flex justify-between">
+        <h1 className="font-serif text-4xl font-bold text-text-1">
+          Buying List
+        </h1>
+
+        <Switch
+          setState={(theme: string | number) => setTheme(theme as ThemeName)}
+          state={themeName}
+          stepsValues={{ start: "light", middle: "system", end: "dark" }}
+          label={themeName}
+        ></Switch>
+      </header>
+
       <nav className="bg-neutral-1 rounded-xl p-1 hidden lg:block">
         <ul className="font-medium text-sm flex justify-evenly gap-5">
           {links.map((link) => (
@@ -55,6 +71,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
       <main className="mt-10">{children}</main>
       <ToastContainer position="bottom-right" />
-    </div>
+    </>
   );
 }

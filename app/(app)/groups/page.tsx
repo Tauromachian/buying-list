@@ -20,6 +20,7 @@ import {
   updateGroup,
 } from "@/lib/api/groups";
 import { toast } from "react-toastify";
+import { addGroupUser, removeGroupUser } from "@/lib/api/usersGroups";
 
 export type GroupMember = {
   userId: string;
@@ -135,11 +136,25 @@ export default function Groups() {
     }
   }
 
-  // Members are UI sketches until a membership endpoint (and the user's
-  // identity model: the members table shows emails the schema doesn't hold)
-  // exists to back them.
-  function addMember() {}
-  function removeMember(id: number | string) {}
+  async function addMember(id: number) {
+    try {
+      await addGroupUser(id);
+      toast.success("Added user to group.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Couldn't add user to group.");
+    }
+  }
+
+  async function removeMember(groupId: number, userId: number) {
+    try {
+      await removeGroupUser(groupId, userId);
+      toast.success("Group's member deleted.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Couldn't remove group member.");
+    }
+  }
 
   let content: React.ReactNode;
   if (loadError) {
