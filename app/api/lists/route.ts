@@ -3,13 +3,21 @@ import { db } from "@/app/api/_db";
 
 import { listsTable } from "@/app/api/_db/schema";
 import { CreateListDTO } from "@/lib/dto/list";
-import { getTokenPayload, isUserAuthenticated } from "@/utils/jwt";
+import { requireAccess } from "@/utils/jwt";
 
-export async function GET() {
+import { eq } from "drizzle-orm";
+
+export async function GET(req: Request) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   try {
     const lists = await db
       .select()
       .from(listsTable)
+      .where(eq(listsTable.userId, Number(tokenPayload.id)))
       .orderBy(listsTable.createdAt);
 
     return Response.json({ data: lists });
@@ -22,11 +30,10 @@ export async function GET() {
 export async function POST(req: Request) {
   let reqData: unknown;
 
-  if (!isUserAuthenticated(req)) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
     return Response.json({ message: "Not Authenticated" }, { status: 401 });
   }
-
-  const tokenPayload = getTokenPayload(req);
 
   try {
     reqData = await req.json();
