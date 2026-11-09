@@ -13,6 +13,7 @@ import { classesMerge } from "@/utils/component-classes";
 import { useThemeStore } from "@/stores/theme";
 
 import { useEffect } from "react";
+import { ThemeName } from "@/types/theme";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const themeName = useThemeStore((state) => state.theme);
