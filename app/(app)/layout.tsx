@@ -14,11 +14,16 @@ import { useThemeStore } from "@/stores/theme";
 
 import { useEffect } from "react";
 import { ThemeName } from "@/types/theme";
+import { Button } from "@/components/Button";
+import { logoutApi } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const themeName = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
   const initTheme = useThemeStore((state) => state.initTheme);
+
+  const router = useRouter();
 
   useEffect(() => {
     initTheme();
@@ -37,6 +42,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
   const pathname = usePathname();
 
+  async function logout() {
+    await logoutApi();
+    router.replace("/auth");
+  }
+
   return (
     <>
       <header className="py-5 flex">
@@ -44,12 +54,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Buying List
         </h1>
 
+        <span className="ml-auto"></span>
+
         <Switch
           setState={(theme: string | number) => setTheme(theme as ThemeName)}
           state={themeName}
           stepsValues={{ start: "light", middle: "system", end: "dark" }}
           label={themeName}
         ></Switch>
+
+        <Button className="ml-3" onClick={logout}>
+          Logout
+        </Button>
       </header>
 
       <nav className="bg-neutral-1 rounded-xl p-1 hidden lg:block">
