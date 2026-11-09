@@ -38,31 +38,18 @@ export function makeRefreshToken() {
   return makeToken({}, JWT_REFRESH_SECRET!, JWT_REFRESH_EXPIRES_IN!);
 }
 
-export async function isUserAuthenticated(req: Request) {
+export function requireAccess(req: Request): TokenPayload | null {
   const authorizationHeader = req.headers.get("Authorization");
 
-  if (!authorizationHeader) return false;
+  if (!authorizationHeader) return null;
 
   const token = authorizationHeader.replace("Bearer ", "");
 
   try {
-    jwt.verify(token, JWT_ACCESS_SECRET!);
-    return true;
+    const payload = jwt.verify(token, JWT_ACCESS_SECRET!);
+
+    return payload as TokenPayload;
   } catch {
-    return false;
+    return null;
   }
-}
-
-export function getTokenPayload(req: Request): TokenPayload {
-  const authorizationHeader = req.headers.get("Authorization");
-
-  if (!authorizationHeader) {
-    throw new Error("Authorization header is required to get the user payload");
-  }
-
-  const token = authorizationHeader.replace("Bearer ", "");
-
-  const user = jwt.decode(token);
-
-  return user as TokenPayload;
 }
