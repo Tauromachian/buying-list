@@ -26,11 +26,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   const links = [
     {
       text: "Lists",
-      link: "/app",
+      link: "/",
     },
     {
       text: "Groups",
-      link: "/app/groups",
+      link: "/groups",
     },
   ];
 
