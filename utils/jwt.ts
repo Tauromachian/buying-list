@@ -56,8 +56,6 @@ export async function isUserAuthenticated(req: Request) {
 export function getTokenPayload(req: Request): TokenPayload {
   const authorizationHeader = req.headers.get("Authorization");
 
-  console.log(authorizationHeader);
-
   if (!authorizationHeader) {
     throw new Error("Authorization header is required to get the user payload");
   }

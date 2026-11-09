@@ -3,6 +3,7 @@ import { db } from "@/app/api/_db";
 
 import { listsTable } from "@/app/api/_db/schema";
 import { CreateListDTO } from "@/lib/dto/list";
+import { getTokenPayload, isUserAuthenticated } from "@/utils/jwt";
 
 export async function GET() {
   try {
@@ -20,6 +21,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   let reqData: unknown;
+
+  if (!isUserAuthenticated(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
+  const tokenPayload = getTokenPayload(req);
+
   try {
     reqData = await req.json();
   } catch (error) {
@@ -33,7 +41,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const result = CreateListDTO.safeParse(reqData);
+  const result = CreateListDTO.safeParse({
+    ...(reqData as object),
+    userId: Number(tokenPayload.id),
+  });
 
   if (!result.success) {
     return Response.json(
