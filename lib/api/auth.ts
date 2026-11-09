@@ -18,3 +18,14 @@ export async function loginApi(credentials: {
 
   return data.data;
 }
+
+export async function logoutApi(): Promise<void> {
+  const endpoint = "/api/auth/logout";
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  handleResponseError(res);
+}
