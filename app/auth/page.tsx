@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import { InputText } from "@/components/InputText";
 import { loginApi } from "@/lib/api/auth";
 import { useAuth } from "@/stores/auth";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -20,6 +21,7 @@ const EMPTY_FORM: User = {
 
 export default function Login() {
   const [form, setForm] = useState<User>({ ...EMPTY_FORM });
+  const router = useRouter();
 
   const setToken = useAuth((store) => store.setToken);
 
@@ -29,6 +31,7 @@ export default function Login() {
     try {
       const token = await loginApi(form);
       setToken(token);
+      router.replace("/");
     } catch (error) {
       console.error(error);
       toast.error("Error login in");
