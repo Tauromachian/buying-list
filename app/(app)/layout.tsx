@@ -51,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <>
       <header className="py-5 flex">
         <h1 className="font-serif text-4xl font-bold text-text-1">
-          Buying List
+          Shopping List
         </h1>
 
         <span className="ml-auto"></span>
