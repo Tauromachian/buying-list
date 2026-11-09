@@ -16,7 +16,7 @@ export function EmptyState({
       )}
     >
       <Icon icon="mdi:file-outline" height="32" width="32"></Icon>
-      {text ?? "Nothing yet, add something!"}
+      <p>{text ?? "Nothing yet, add something!"}</p>
     </div>
   );
 }
