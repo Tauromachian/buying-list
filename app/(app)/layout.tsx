@@ -39,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
     <>
-      <header className="pt-5 flex justify-between">
+      <header className="py-5 flex">
         <h1 className="font-serif text-4xl font-bold text-text-1">
           Buying List
         </h1>
