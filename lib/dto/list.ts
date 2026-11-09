@@ -13,7 +13,6 @@ export type List = z.infer<typeof ListDTO>;
 
 export const CreateListDTO = ListDTO.omit({
   id: true,
-  userId: true,
   createdAt: true,
 });
 
