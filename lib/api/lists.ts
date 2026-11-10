@@ -20,6 +20,15 @@ export async function getLists(): Promise<List[]> {
   return data;
 }
 
+export async function getList(id: number | string) {
+  const res = await authFetch(`/api/lists/${id}`);
+
+  handleResponseError(res);
+
+  const { data } = (await res.json()) as { data: List };
+  return data;
+}
+
 /** POST /api/lists — expects the `{ data: … }` envelope. */
 export async function createList(data: CreateList): Promise<List> {
   const res = await authFetch("/api/lists", {
