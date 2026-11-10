@@ -260,9 +260,11 @@ export default function Home() {
 
       <h1 className="mb-5 text-xl">List</h1>
 
-      <Button className="ml-auto" onClick={() => openFormDialog("add")}>
-        Add Item
-      </Button>
+      {!isMissing && (
+        <Button className="ml-auto" onClick={() => openFormDialog("add")}>
+          Add Item
+        </Button>
+      )}
 
       <Dialog open={isDialogOpen} onClose={setIsDialogOpen}>
         <Card>
