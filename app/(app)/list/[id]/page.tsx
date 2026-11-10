@@ -18,6 +18,9 @@ import type { CreateItem, Item } from "@/lib/dto/item";
 import { Icon } from "@/components/Icon";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { toast } from "react-toastify";
+import { getList } from "@/lib/api/lists";
+import Link from "next/link";
+import { NotFound } from "@/utils/errors";
 
 function assertItem(item?: Item, msg?: string): asserts item is Item {
   msg ??= "This object should be of type Item.";
@@ -96,6 +99,7 @@ export default function Home() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
+  const [isMissing, setIsMissing] = useState<boolean>(false);
 
   const [activeItems, setActiveItems] = useState<string[]>([]);
 
@@ -106,10 +110,17 @@ export default function Home() {
     setLoadError(null);
 
     try {
+      await getList(currentListId);
+
       setItems(await getItems({ listId: currentListId }));
     } catch (error) {
       console.error(error);
-      setLoadError("Couldn't load items.");
+
+      if (error instanceof NotFound) {
+        setIsMissing(true);
+      } else {
+        setLoadError("Couldn't load items.");
+      }
     }
 
     setIsLoading(false);
@@ -207,7 +218,17 @@ export default function Home() {
   }
 
   let content: React.ReactNode;
-  if (loadError) {
+  if (isMissing) {
+    content = (
+      <div>
+        <p>404: No Such list exists</p>
+
+        <Link href="/" className="text-blue-400 underline ml-auto mr-2">
+          Back to Lists
+        </Link>
+      </div>
+    );
+  } else if (loadError) {
     content = (
       <div className="flex flex-col items-center gap-3" role="alert">
         <p>{loadError}</p>
