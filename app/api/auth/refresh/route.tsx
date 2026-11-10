@@ -55,7 +55,13 @@ export async function POST() {
       .from(usersTable)
       .where(eq(usersTable.id, session.userId));
 
-    if (!user) throw new Error("User does not exist");
+    if (!user) {
+      cookiesStore.delete("refreshToken");
+      return Response.json(
+        { message: "Invalid or expired refresh token" },
+        { status: 401 },
+      );
+    }
 
     const accessToken = makeAccessToken({
       id: String(user.id),
