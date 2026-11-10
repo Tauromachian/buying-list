@@ -14,18 +14,14 @@ export class GeneralResNotOk extends Error {
   }
 }
 
-export class NotFound extends Error {
+export class NotFound extends GeneralResNotOk {
   constructor(res: Response) {
-    const msg = `HTTP ERROR::: Status:${res.status} Text:${res.statusText}`;
-
-    super(msg);
+    super(res);
   }
 }
 
-export class NotAuthenticated extends Error {
+export class NotAuthenticated extends GeneralResNotOk {
   constructor(res: Response) {
-    const msg = `HTTP ERROR::: Status:${res.status} Text:${res.statusText}`;
-
-    super(msg);
+    super(res);
   }
 }
