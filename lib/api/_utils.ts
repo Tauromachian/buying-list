@@ -1,4 +1,4 @@
-import { GeneralResNotOk } from "@/utils/errors";
+import { GeneralResNotOk, NotFound } from "@/utils/errors";
 import { useAuth } from "@/stores/auth";
 
 const SERVER_ERROR_PAGE = "/server-error";
@@ -11,6 +11,10 @@ const SERVER_ERROR_PAGE = "/server-error";
  * would keep going and feed the error body to `res.json()`).
  */
 export function handleResponseError(res: Response) {
+  if (res.status === 404) {
+    throw new NotFound(res);
+  }
+
   if (res.status >= 500) {
     window.location.replace(SERVER_ERROR_PAGE);
     throw new GeneralResNotOk(res);
