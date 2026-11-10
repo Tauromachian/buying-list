@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
@@ -20,6 +20,7 @@ import {
 import type { CreateList, List } from "@/lib/dto/list";
 import { Loader } from "@/components/Loader";
 import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function assertList(list?: List, msg?: string): asserts list is List {
   msg ??= "This object should be of type List.";
@@ -61,114 +62,111 @@ function ListRow({
 }
 
 export default function Home() {
-  const [lists, setLists] = useState<List[]>([]);
-
   const [form, setForm] = useState<CreateList>(EMPTY_FORM);
   const [selectedList, setSelectedList] = useState<List>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
   const [search, setSearch] = useState<string>("");
 
+  const queryClient = useQueryClient();
+
+  const { isPending, data, isError, error } = useQuery({
+    queryKey: ["lists"],
+    queryFn: async function () {
+      const data = await getLists();
+      return data;
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async function addList(data: CreateList) {
+      await createList(data);
+    },
+    onSuccess() {
+      setIsDialogOpen(false);
+      toast.success("List created!");
+      queryClient.invalidateQueries({ queryKey: ["lists"] });
+      setForm(EMPTY_FORM);
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't create the list.");
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async function editList(formData: CreateList) {
+      assertList(selectedList);
+      await updateList(selectedList.id, formData);
+    },
+    onSuccess() {
+      setIsDialogOpen(false);
+      setForm(EMPTY_FORM);
+      setSelectedList(undefined);
+      toast.success("List updated!");
+      queryClient.invalidateQueries({ queryKey: ["lists"] });
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't update the list.");
+    },
+  });
+
+  const cloneMutation = useMutation({
+    mutationFn: async function clone(list: List) {
+      await cloneList(list.id);
+    },
+    onSuccess() {
+      toast.success("Cloned list successfully");
+      queryClient.invalidateQueries({ queryKey: ["lists"] });
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't clone list");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async function removeList() {
+      assertList(selectedList);
+      await deleteList(selectedList.id);
+    },
+    onSuccess() {
+      setIsDeleteConfirmationDialogOpen(false);
+      setSelectedList(undefined);
+      toast.success("List deleted!");
+      queryClient.invalidateQueries({ queryKey: ["lists"] });
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't delete the list.");
+    },
+  });
+
   const filteredLists = useMemo<List[]>(() => {
-    if (!search) return lists;
+    if (!data) return [];
+    if (!search) return data;
 
     const newLists = [];
 
-    for (const list of lists) {
-      if (list.name.includes(search)) {
-        newLists.push(list);
+    for (const item of data) {
+      if (item.name.includes(search)) {
+        newLists.push(item);
       }
     }
 
     return newLists;
-  }, [lists, search]);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async function () {
-    setIsLoading(true);
-    setLoadError(null);
-
-    try {
-      setLists(await getLists());
-    } catch (error) {
-      console.error(error);
-      setLoadError("Couldn't load lists.");
-    }
-
-    setIsLoading(false);
-  };
-
-  async function addList(data: CreateList) {
-    try {
-      const inserted = await createList(data);
-
-      setLists((prev) => [...prev, inserted]);
-      setIsDialogOpen(false);
-      setForm(EMPTY_FORM);
-      toast.success("List created!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't create the list.");
-    }
-  }
-
-  async function editList(formData: CreateList) {
-    assertList(selectedList);
-
-    try {
-      await updateList(selectedList.id, formData);
-
-      setIsDialogOpen(false);
-      setForm(EMPTY_FORM);
-      setSelectedList(undefined);
-      await loadData();
-      toast.success("List updated!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't update the list.");
-    }
-  }
+  }, [data, search]);
 
   function submit(event: React.SubmitEvent) {
     event.preventDefault();
 
     if (!selectedList) {
-      addList(form);
+      createMutation.mutate(form);
     } else {
-      editList(form);
-    }
-  }
-
-  async function removeList() {
-    assertList(selectedList);
-
-    try {
-      await deleteList(selectedList.id);
-      await loadData();
-      setIsDeleteConfirmationDialogOpen(false);
-      setSelectedList(undefined);
-      toast.success("List deleted!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't delete the list.");
-    }
-  }
-
-  async function clone(list: List) {
-    try {
-      const { message } = await cloneList(list.id);
-      loadData();
-      toast.success(message);
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't clone list");
+      updateMutation.mutate(form);
     }
   }
 
@@ -202,16 +200,15 @@ export default function Home() {
   }
 
   let content: React.ReactNode;
-  if (loadError) {
+  if (isError) {
     content = (
       <div className="flex flex-col items-center gap-3" role="alert">
-        <p>{loadError}</p>
-        <Button onClick={() => loadData()}>Try again</Button>
+        <p>Couldn't load lists.</p>
       </div>
     );
-  } else if (isLoading) {
+  } else if (isPending) {
     content = <Loader size="md" className="my-10"></Loader>;
-  } else if (lists.length === 0) {
+  } else if (data?.length === 0) {
     content = <EmptyState />;
   } else {
     content = (
@@ -227,7 +224,7 @@ export default function Home() {
             <ListRow
               key={list.id}
               list={list}
-              onClone={clone}
+              onClone={(list) => cloneMutation.mutate(list)}
               onEdit={(list) => openDialog("edit", list)}
               onDelete={openDeleteConfirmationDialog}
             />
@@ -277,7 +274,7 @@ export default function Home() {
       <DeleteConfirmationDialog
         open={isDeleteConfirmationDialogOpen}
         onClose={() => setIsDeleteConfirmationDialogOpen(false)}
-        onDelete={() => removeList()}
+        onDelete={() => deleteMutation.mutate()}
       ></DeleteConfirmationDialog>
     </div>
   );
