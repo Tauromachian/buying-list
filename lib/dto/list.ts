@@ -23,5 +23,5 @@ export const UpdateListDTO = ListDTO.omit({
   createdAt: true,
 }).partial();
 
-export type CreateList = z.infer<typeof CreateListDTO>;
+export type CreateList = Omit<z.infer<typeof CreateListDTO>, "userId">;
 export type UpdateList = z.infer<typeof UpdateListDTO>;
