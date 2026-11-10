@@ -1,16 +1,39 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { flattenError } from "zod";
 import { db } from "@/app/api/_db";
-import { itemsTable } from "@/app/api/_db/schema";
+import { itemsTable, listsTable } from "@/app/api/_db/schema";
 import { invalidId, parseId } from "@/app/api/_utils/ids";
 import { UpdateItemDTO } from "@/lib/dto/item";
+import { requireAccess } from "@/utils/jwt";
 
-export async function DELETE(_: Request, ctx: RouteContext<"/api/items/[id]">) {
+async function requireItemOwnership(
+  itemId: number,
+  userId: number,
+): Promise<boolean> {
+  const owned = await db
+    .select({ id: itemsTable.id })
+    .from(itemsTable)
+    .innerJoin(listsTable, eq(itemsTable.listId, listsTable.id))
+    .where(and(eq(itemsTable.id, itemId), eq(listsTable.userId, userId)));
+
+  return owned.length > 0;
+}
+
+export async function DELETE(req: Request, ctx: RouteContext<"/api/items/[id]">) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   const { id: rawId } = await ctx.params;
   const id = parseId(rawId);
   if (!id) return invalidId(rawId, "item");
 
   try {
+    if (!(await requireItemOwnership(id, Number(tokenPayload.id)))) {
+      return Response.json({ message: "Item not found" }, { status: 404 });
+    }
+
     await db.delete(itemsTable).where(eq(itemsTable.id, id));
 
     return new Response(null, { status: 204 });
@@ -24,6 +47,11 @@ export async function PATCH(
   req: Request,
   ctx: RouteContext<"/api/items/[id]">,
 ) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   const { id: rawId } = await ctx.params;
   const id = parseId(rawId);
   if (!id) return invalidId(rawId, "item");
@@ -58,6 +86,10 @@ export async function PATCH(
   }
 
   try {
+    if (!(await requireItemOwnership(id, Number(tokenPayload.id)))) {
+      return Response.json({ message: "Item not found" }, { status: 404 });
+    }
+
     await db.update(itemsTable).set(result.data).where(eq(itemsTable.id, id));
 
     return new Response(null, { status: 204 });

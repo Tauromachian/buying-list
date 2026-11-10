@@ -3,8 +3,13 @@ import { db } from "@/app/api/_db";
 
 import { groupsTable } from "@/app/api/_db/schema";
 import { CreateGroupDTO } from "@/lib/dto/group";
+import { requireAccess } from "@/utils/jwt";
 
-export async function GET() {
+export async function GET(req: Request) {
+  if (!requireAccess(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   try {
     const groups = await db.select().from(groupsTable).orderBy(groupsTable.id);
 
@@ -16,6 +21,10 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!requireAccess(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   let reqData: unknown;
   try {
     reqData = await req.json();

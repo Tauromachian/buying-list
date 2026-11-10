@@ -1,12 +1,19 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { flattenError } from "zod";
 
 import { db } from "@/app/api/_db";
 import { itemsTable, listsTable } from "@/app/api/_db/schema";
 import { CreateItemDTO } from "@/lib/dto/item";
+import { requireAccess } from "@/utils/jwt";
 
 export async function GET(req: NextRequest) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
+  const userId = Number(tokenPayload.id);
   const searchParams = req.nextUrl.searchParams;
 
   let listId: string | number | null = searchParams.get("listId");
@@ -20,16 +27,39 @@ export async function GET(req: NextRequest) {
   }
 
   let items;
-  let lists = [];
   try {
-    lists = await db.select().from(listsTable).where(eq(listsTable.id, listId));
+    if (listId) {
+      const owned = await db
+        .select({ id: listsTable.id })
+        .from(listsTable)
+        .where(and(eq(listsTable.id, listId), eq(listsTable.userId, userId)));
 
-    items = await db
-      .select()
-      .from(itemsTable)
-      .where(listId ? eq(itemsTable.listId, listId) : undefined);
+      if (owned.length === 0) {
+        return Response.json({ message: "List not found" }, { status: 404 });
+      }
+
+      items = await db
+        .select()
+        .from(itemsTable)
+        .where(eq(itemsTable.listId, listId));
+    } else {
+      const userLists = await db
+        .select({ id: listsTable.id })
+        .from(listsTable)
+        .where(eq(listsTable.userId, userId));
+
+      const ids = userLists.map((list) => list.id);
+
+      items =
+        ids.length > 0
+          ? await db
+              .select()
+              .from(itemsTable)
+              .where(inArray(itemsTable.listId, ids))
+          : [];
+    }
   } catch (error) {
-    console.error("[GET /api/items/:id] DB failure:", error);
+    console.error("[GET /api/items] DB failure:", error);
     return Response.json(
       {
         message: "Internal server error",
@@ -38,19 +68,15 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (listId && !lists?.length) {
-    return Response.json(
-      {
-        message: "List not found",
-      },
-      { status: 404 },
-    );
-  }
-
   return Response.json({ data: items });
 }
 
 export async function POST(req: Request) {
+  const tokenPayload = requireAccess(req);
+  if (!tokenPayload) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   try {
     var data = await req.json();
   } catch (error) {
@@ -81,6 +107,20 @@ export async function POST(req: Request) {
   const item = result.data;
 
   try {
+    const owned = await db
+      .select({ id: listsTable.id })
+      .from(listsTable)
+      .where(
+        and(
+          eq(listsTable.id, item.listId),
+          eq(listsTable.userId, Number(tokenPayload.id)),
+        ),
+      );
+
+    if (owned.length === 0) {
+      return Response.json({ message: "List not found" }, { status: 404 });
+    }
+
     const [inserted] = await db.insert(itemsTable).values(item).returning();
     return Response.json({ data: inserted }, { status: 201 });
   } catch (error) {

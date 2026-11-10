@@ -1,12 +1,17 @@
 import { db } from "@/app/api/_db";
 import { usersGroupsTable } from "@/app/api/_db/schema";
 import { invalidId, parseId } from "@/app/api/_utils/ids";
+import { requireAccess } from "@/utils/jwt";
 import { and, eq } from "drizzle-orm";
 
 export async function DELETE(
-  _: Request,
+  req: Request,
   ctx: RouteContext<"/api/groups/[id]/users/[userId]">,
 ) {
+  if (!requireAccess(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   const { id: rawGroupId, userId: rawUserId } = await ctx.params;
 
   const groupId = parseId(rawGroupId);
@@ -25,10 +30,10 @@ export async function DELETE(
         ),
       );
 
-    return Response.json({ message: "Success delete" }, { status: 204 });
+    return new Response(null, { status: 204 });
   } catch (error) {
-    console.error(error);
+    console.error("[DELETE /api/groups/[id]/users/[userId]] DB failure:", error);
 
-    return Response.json;
+    return Response.json({ message: "Internal server error" }, { status: 500 });
   }
 }

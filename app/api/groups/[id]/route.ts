@@ -4,11 +4,16 @@ import { db } from "@/app/api/_db";
 import { groupsTable, usersGroupsTable } from "@/app/api/_db/schema";
 import { invalidId, parseId } from "@/app/api/_utils/ids";
 import { UpdateGroupDTO } from "@/lib/dto/group";
+import { requireAccess } from "@/utils/jwt";
 
 export async function PATCH(
   req: Request,
   ctx: RouteContext<"/api/groups/[id]">,
 ) {
+  if (!requireAccess(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   const { id: rawId } = await ctx.params;
   const id = parseId(rawId);
   if (!id) return invalidId(rawId, "group");
@@ -53,7 +58,11 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(_: Request, ctx: RouteContext<"/api/groups/[id]">) {
+export async function DELETE(req: Request, ctx: RouteContext<"/api/groups/[id]">) {
+  if (!requireAccess(req)) {
+    return Response.json({ message: "Not Authenticated" }, { status: 401 });
+  }
+
   const { id: rawId } = await ctx.params;
   const id = parseId(rawId);
   if (!id) return invalidId(rawId, "group");
