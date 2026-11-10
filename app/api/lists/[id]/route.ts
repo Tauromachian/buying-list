@@ -6,6 +6,29 @@ import { invalidId, parseId } from "@/app/api/_utils/ids";
 import { UpdateListDTO } from "@/lib/dto/list";
 import { requireAccess } from "@/utils/jwt";
 
+export async function GET(_: Request, ctx: RouteContext<"/api/lists/[id]">) {
+  const { id: rawId } = await ctx.params;
+
+  const id = parseId(rawId);
+  if (!id) return invalidId(rawId, "list");
+
+  try {
+    const lists = await db
+      .select()
+      .from(listsTable)
+      .where(eq(listsTable.id, Number(id)));
+
+    if (!lists[0]) {
+      return Response.json({ message: "List not found" }, { status: 404 });
+    }
+
+    return Response.json({ data: lists[0] });
+  } catch (error) {
+    console.error("[GET /api/lists/:id] DB failure:", error);
+    return Response.json({ message: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   ctx: RouteContext<"/api/lists/[id]">,
