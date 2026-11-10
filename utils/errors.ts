@@ -13,3 +13,11 @@ export class GeneralResNotOk extends Error {
     super(msg);
   }
 }
+
+export class NotFound extends Error {
+  constructor(res: Response) {
+    const msg = `HTTP ERROR::: Status:${res.status} Text:${res.statusText}`;
+
+    super(msg);
+  }
+}
