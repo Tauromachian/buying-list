@@ -21,3 +21,11 @@ export class NotFound extends Error {
     super(msg);
   }
 }
+
+export class NotAuthenticated extends Error {
+  constructor(res: Response) {
+    const msg = `HTTP ERROR::: Status:${res.status} Text:${res.statusText}`;
+
+    super(msg);
+  }
+}
