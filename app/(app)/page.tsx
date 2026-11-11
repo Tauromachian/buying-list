@@ -72,7 +72,7 @@ export default function Home() {
 
   const queryClient = useQueryClient();
 
-  const { isPending, data, isError, error } = useQuery({
+  const { isPending, data, isError } = useQuery({
     queryKey: ["lists"],
     queryFn: async function () {
       const data = await getLists();
