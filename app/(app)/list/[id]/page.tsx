@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { type BreadcrumbItem, Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { getList } from "@/lib/api/lists";
 import Link from "next/link";
 import { NotFound } from "@/utils/errors";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function assertItem(item?: Item, msg?: string): asserts item is Item {
   msg ??= "This object should be of type Item.";
@@ -84,47 +85,45 @@ function ItemRow({
 }
 
 export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
-
   const { id } = useParams<{ id: string }>();
   const listId = id;
 
-  useEffect(() => {
-    loadData(Number(listId));
-  }, [listId]);
-
   const [form, setForm] = useState<ItemForm>(EMPTY_FORM);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [isDeleteConfirmationDialogOpen, setIsDeleteConfirmationDialogOpen] =
     useState<boolean>();
-  const [isMissing, setIsMissing] = useState<boolean>(false);
 
   const [activeItems, setActiveItems] = useState<string[]>([]);
 
   const [selectedItem, setSelectedItem] = useState<Item>();
 
-  const loadData = async function (currentListId: number) {
-    setIsLoading(true);
-    setLoadError(null);
+  const queryClient = useQueryClient();
 
-    try {
-      await getList(currentListId);
+  const listQuery = useQuery({
+    queryKey: ["lists", listId],
+    queryFn: async () => {
+      const list = await getList(listId);
+      return list;
+    },
+  });
 
-      setItems(await getItems({ listId: currentListId }));
-    } catch (error) {
-      console.error(error);
-
-      if (error instanceof NotFound) {
-        setIsMissing(true);
-      } else {
-        setLoadError("Couldn't load items.");
-      }
+  const isMissing = useMemo(() => {
+    if (listQuery.error instanceof NotFound) {
+      return true;
     }
 
-    setIsLoading(false);
-  };
+    return false;
+  }, [listQuery]);
+
+  const itemsQuery = useQuery({
+    queryKey: ["items", listId],
+    queryFn: async () => {
+      const items = await getItems({ listId });
+
+      return items;
+    },
+    enabled: !isMissing,
+  });
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -140,42 +139,68 @@ export default function Home() {
     event.preventDefault();
 
     if (!selectedItem) {
-      addItem({ ...form, checked: false, listId: Number(listId) });
+      createMutation.mutate({
+        ...form,
+        checked: false,
+        listId: Number(listId),
+      });
     } else {
-      editItem(form);
+      editMutation.mutate(form);
     }
   }
 
-  async function addItem(data: CreateItem) {
-    try {
-      const inserted = await createItem(data);
-
-      setItems((prev) => [...prev, inserted]);
+  const createMutation = useMutation({
+    mutationFn: async (item: CreateItem) => {
+      await createItem(item);
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't add the item.");
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["items", listId] });
       setIsDialogOpen(false);
       setForm({ ...EMPTY_FORM, listId: Number(listId) });
       toast.success("Item added!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't add the item.");
-    }
-  }
+    },
+  });
 
-  async function editItem(formData: Partial<Item>) {
-    assertItem(selectedItem);
+  const editMutation = useMutation({
+    mutationFn: async (formData: Partial<Item>) => {
+      if (!selectedItem?.id) throw new Error("There should be a selected item");
 
-    try {
       await updateItem(selectedItem.id, formData);
-
+    },
+    onError(error) {
+      console.error(error);
+      toast.error("Couldn't update the item.");
+    },
+    onSuccess() {
       setIsDialogOpen(false);
       setForm(EMPTY_FORM);
       setSelectedItem(undefined);
-      await loadData(Number(listId));
+
+      queryClient.invalidateQueries({ queryKey: ["items", listId] });
       toast.success("Item updated!");
-    } catch (error) {
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      assertItem(selectedItem);
+      await deleteItem(selectedItem.id);
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["items", listId] });
+      setIsDeleteConfirmationDialogOpen(false);
+      setSelectedItem(undefined);
+      toast.success("Item deleted!");
+    },
+    onError(error) {
       console.error(error);
-      toast.error("Couldn't update the item.");
-    }
-  }
+      toast.error("Couldn't delete the item.");
+    },
+  });
 
   function openFormDialog(type: "add" | "edit", item?: Item) {
     if (type === "edit") {
@@ -202,21 +227,6 @@ export default function Home() {
     setIsDeleteConfirmationDialogOpen(true);
   }
 
-  async function removeItem() {
-    assertItem(selectedItem);
-
-    try {
-      await deleteItem(selectedItem.id);
-      await loadData(Number(listId));
-      setIsDeleteConfirmationDialogOpen(false);
-      setSelectedItem(undefined);
-      toast.success("Item deleted!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Couldn't delete the item.");
-    }
-  }
-
   let content: React.ReactNode;
   if (isMissing) {
     content = (
@@ -228,19 +238,19 @@ export default function Home() {
         </Link>
       </div>
     );
-  } else if (loadError) {
+  } else if (itemsQuery.isError) {
     content = (
       <div className="flex flex-col items-center gap-3" role="alert">
-        <p>{loadError}</p>
-        <Button onClick={() => loadData(Number(listId))}>Try again</Button>
+        <p>There was an issue loading the items.</p>
+        <Button onClick={() => itemsQuery.refetch()}>Try again</Button>
       </div>
     );
-  } else if (isLoading) {
+  } else if (itemsQuery.isPending) {
     content = <Loader size="md" className="my-10"></Loader>;
-  } else if (items.length === 0) {
+  } else if (itemsQuery?.data?.length === 0) {
     content = <EmptyState />;
   } else {
-    content = items.map((item) => (
+    content = itemsQuery?.data?.map((item) => (
       <ItemRow
         key={item.id}
         item={item}
@@ -299,7 +309,7 @@ export default function Home() {
       <DeleteConfirmationDialog
         open={isDeleteConfirmationDialogOpen}
         onClose={() => setIsDeleteConfirmationDialogOpen(false)}
-        onDelete={() => removeItem()}
+        onDelete={() => deleteMutation.mutate()}
       ></DeleteConfirmationDialog>
     </div>
   );
